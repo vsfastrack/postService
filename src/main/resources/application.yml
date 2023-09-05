@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: postService
+  datasource:
+    username: postgres
+    url: jdbc:postgresql://techbee-cluster.cpeem5xmvx4h.ap-south-1.rds.amazonaws.com:5432/techbeeDb
+    driverClassName: org.postgresql.Driver
+    password: admin12345
+server:
+  port: 8081
