@@ -18,8 +18,8 @@ public class TagResource {
     private final TagService tagService;
 
     @TransactionId
-    @GetMapping("/search")
-    public ResponseEntity<ApiResponseDTO> findTagByName(@RequestParam("tagName") final String tagName){
+    @GetMapping("/{tagName}")
+    public ResponseEntity<ApiResponseDTO> findTagByName(@PathVariable("tagName") final String tagName){
         TagDTO tagDTO = tagService.findTagByName(tagName);
         return new ResponseEntity<>(ApiResponseDTO.builder().content(tagDTO).build() , HttpStatus.CREATED);
     }
