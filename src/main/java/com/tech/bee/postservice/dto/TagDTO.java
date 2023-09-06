@@ -11,7 +11,9 @@ import java.time.LocalDateTime;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TagDTO {
     private String tagId;
+    private String identifier;
     private String name;
     private String createdBy;
     private LocalDateTime createdWhen;
+    private LocalDateTime lastModified;
 }

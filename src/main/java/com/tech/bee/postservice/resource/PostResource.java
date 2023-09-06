@@ -26,5 +26,4 @@ public class PostResource {
         String postId = postService.createPost(postDTO);
         return new ResponseEntity<>(ApiResponseDTO.builder().content(postId).build() , HttpStatus.CREATED);
     }
-
 }

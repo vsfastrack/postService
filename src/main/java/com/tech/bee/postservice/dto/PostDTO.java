@@ -14,7 +14,8 @@ public class PostDTO {
     private String subtitle;
     private String link;
     private String content;
+    private String category;
     private String authorId;
     private List<TagDTO> tags;
-    private List<ReferenceDTO> references;
+    private List<String> references;
 }

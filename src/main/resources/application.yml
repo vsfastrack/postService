@@ -1,6 +1,8 @@
 spring:
   application:
     name: postService
+  profiles:
+    active: local
   datasource:
     username: postgres
     url: jdbc:postgresql://techbee-cluster.cpeem5xmvx4h.ap-south-1.rds.amazonaws.com:5432/techbeeDb

@@ -23,6 +23,7 @@ public class PostEntity {
     private String identifier = UUID.randomUUID().toString();
     private String title;
     private String subtitle;
+    private String category;
     private String link;
     private String content;
     private String authorId;
@@ -31,10 +32,7 @@ public class PostEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private Set<TagEntity>  tags = new HashSet<>();
-    @ManyToMany
-    @JoinTable(name = "post_references",joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "reference_id")
-    )
+    @OneToMany(mappedBy = "post")
     private Set<ReferenceEntity> references = new HashSet<>();
     @CreatedDate
     private LocalDateTime createdWhen;

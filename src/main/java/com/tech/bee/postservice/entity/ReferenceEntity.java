@@ -2,12 +2,12 @@ package com.tech.bee.postservice.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.reflect.MethodDelegate;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -18,10 +18,14 @@ public class ReferenceEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String referenceId;
-    private String type;
+    private String identifier = UUID.randomUUID().toString();
     private String content;
-    @ManyToMany(mappedBy = "posts")
-    private Set<PostEntity> posts = new HashSet<>();
+    @ManyToOne
+    @JoinColumn(referencedColumnName = "post_id")
+    private PostEntity postEntity;
     private String createdBy;
+    @CreatedDate
     private LocalDateTime createdWhen;
+    @LastModifiedDate
+    private LocalDateTime lastModifiedWhen;
 }

@@ -14,6 +14,7 @@ public interface PostMapper {
     @Mapping(source = "subtitle" , target = "subtitle")
     @Mapping(source = "content" , target = "content")
     @Mapping(source = "authorId" , target = "authorId")
+    @Mapping(ignore = true, target = "references")
     @Mapping(expression = "java(toId(postDTO))" , target="postId")
     public PostEntity toEntity(PostDTO postDTO);
 
