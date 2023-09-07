@@ -1,6 +1,6 @@
 spring:
   datasource:
     username: postgres
-    url: jdbc:postgresql://localhost.com:5432/techbeeDb
+    url: jdbc:postgresql://localhost:5432/techbeeDb
     driverClassName: org.postgresql.Driver
     password: admin12345

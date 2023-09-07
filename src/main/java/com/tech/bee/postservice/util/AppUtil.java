@@ -1,10 +1,8 @@
 package com.tech.bee.postservice.util;
 
 import com.tech.bee.postservice.common.ErrorDTO;
-import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.enums.Enums;
 import lombok.experimental.UtilityClass;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 

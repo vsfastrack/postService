@@ -19,6 +19,7 @@ public class PostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "post_id")
     private String postId;
     private String identifier = UUID.randomUUID().toString();
     private String title;
@@ -27,10 +28,7 @@ public class PostEntity {
     private String link;
     private String content;
     private String authorId;
-    @ManyToMany
-    @JoinTable(name = "post_tags",joinColumns = @JoinColumn(name = "post_id"),
-            inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
+    @ManyToMany(mappedBy = "posts")
     private Set<TagEntity>  tags = new HashSet<>();
     @OneToMany(mappedBy = "post")
     private Set<ReferenceEntity> references = new HashSet<>();

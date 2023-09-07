@@ -17,12 +17,13 @@ public class ReferenceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "reference_id")
     private String referenceId;
     private String identifier = UUID.randomUUID().toString();
     private String content;
     @ManyToOne
     @JoinColumn(referencedColumnName = "post_id")
-    private PostEntity postEntity;
+    private PostEntity post;
     private String createdBy;
     @CreatedDate
     private LocalDateTime createdWhen;

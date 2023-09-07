@@ -19,10 +19,16 @@ public class TagEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(name = "tag_id")
     private String tagId;
     private String identifier = UUID.randomUUID().toString();
     private String name;
-    @ManyToMany(mappedBy = "posts")
+    @ManyToMany
+    @JoinTable(
+            name = "post_tag",
+            joinColumns = @JoinColumn(name = "tag_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id")
+    )
     private Set<PostEntity> posts = new HashSet<>();
     private String createdBy;
     @CreatedDate

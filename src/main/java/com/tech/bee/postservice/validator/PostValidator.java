@@ -1,9 +1,9 @@
 package com.tech.bee.postservice.validator;
 
 import com.tech.bee.postservice.common.ErrorDTO;
-import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.dto.PostDTO;
 import com.tech.bee.postservice.enums.Enums;
+import com.tech.bee.postservice.constants.ApiConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;

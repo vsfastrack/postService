@@ -1,7 +1,7 @@
 package com.tech.bee.postservice.mapper;
 
-import com.tech.bee.postservice.entity.ReferenceEntity;
 import com.tech.bee.postservice.util.AppUtil;
+import com.tech.bee.postservice.entity.ReferenceEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;

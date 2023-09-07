@@ -1,9 +1,9 @@
-package com.tech.bee.postservice.resource;
+package com.tech.bee.postservice.api;
 
 import com.tech.bee.postservice.annotation.TransactionId;
 import com.tech.bee.postservice.common.ApiResponseDTO;
-import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.dto.PostDTO;
+import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = ApiConstants.PathConstants.PATH_POST_RESOURCE)
-public class PostResource {
+public class PostApi {
 
     private final PostService postService;
 

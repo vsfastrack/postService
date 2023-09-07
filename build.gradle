@@ -1,6 +1,6 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '2.7.15'
+	id 'org.springframework.boot' version '2.7.12'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
@@ -34,10 +34,10 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-aop'
-	implementation group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
-	implementation group: 'org.springframework.data', name: 'spring-data-jpa', version: '2.7.13'
-	implementation group: 'org.postgresql', name: 'postgresql', version: '42.1.4'
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+	implementation group: 'javax.persistence', name: 'javax.persistence-api'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation group: 'org.postgresql', name: 'postgresql'
+	implementation group: 'org.apache.commons', name: 'commons-lang3'
 	implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.0'
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"

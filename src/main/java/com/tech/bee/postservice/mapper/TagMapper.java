@@ -1,8 +1,8 @@
 package com.tech.bee.postservice.mapper;
 
+import com.tech.bee.postservice.util.AppUtil;
 import com.tech.bee.postservice.dto.TagDTO;
 import com.tech.bee.postservice.entity.TagEntity;
-import com.tech.bee.postservice.util.AppUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
