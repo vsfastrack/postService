@@ -1,4 +1,4 @@
-package com.tech.bee.postservice.api;
+package com.tech.bee.postservice.resources;
 
 import com.tech.bee.postservice.annotation.TransactionId;
 import com.tech.bee.postservice.common.ApiResponseDTO;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = ApiConstants.PathConstants.PATH_POST_RESOURCE)
-public class PostApi {
+public class PostResource {
 
     private final PostService postService;
 

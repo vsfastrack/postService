@@ -1,7 +1,8 @@
-package com.tech.bee.postservice.api;
+package com.tech.bee.postservice.resources;
 
 import com.tech.bee.postservice.annotation.TransactionId;
 import com.tech.bee.postservice.common.ApiResponseDTO;
+import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.dto.TagDTO;
 import com.tech.bee.postservice.service.TagService;
 import lombok.RequiredArgsConstructor;
@@ -11,13 +12,13 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/tag")
-public class TagApi {
+@RequestMapping(value = ApiConstants.PathConstants.PATH_TAG_RESOURCE)
+public class TagResource {
 
     private final TagService tagService;
 
     @TransactionId
-    @GetMapping("/search")
+    @GetMapping(value="/search")
     public ResponseEntity<ApiResponseDTO> findTagByName(@RequestParam("tagName") final String tagName){
         TagDTO tagDTO = tagService.findTagByName(tagName);
         return new ResponseEntity<>(ApiResponseDTO.builder().content(tagDTO).build() , HttpStatus.CREATED);

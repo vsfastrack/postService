@@ -2,13 +2,11 @@ package com.tech.bee.postservice.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -23,16 +21,9 @@ public class TagEntity {
     private String tagId;
     private String identifier = UUID.randomUUID().toString();
     private String name;
-    @ManyToMany
-    @JoinTable(
-            name = "post_tag",
-            joinColumns = @JoinColumn(name = "tag_id"),
-            inverseJoinColumns = @JoinColumn(name = "post_id")
-    )
-    private Set<PostEntity> posts = new HashSet<>();
     private String createdBy;
-    @CreatedDate
+    @CreationTimestamp
     private LocalDateTime createdWhen;
-    @LastModifiedDate
+    @UpdateTimestamp
     private LocalDateTime lastModified;
 }

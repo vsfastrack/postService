@@ -4,11 +4,12 @@ import com.tech.bee.postservice.common.ErrorDTO;
 import com.tech.bee.postservice.dto.PostDTO;
 import com.tech.bee.postservice.dto.TagDTO;
 import com.tech.bee.postservice.entity.PostEntity;
-import com.tech.bee.postservice.entity.ReferenceEntity;
+import com.tech.bee.postservice.entity.LinkEntity;
 import com.tech.bee.postservice.entity.TagEntity;
 import com.tech.bee.postservice.mapper.PostMapper;
-import com.tech.bee.postservice.mapper.ReferenceMapper;
+import com.tech.bee.postservice.mapper.LinkMapper;
 import com.tech.bee.postservice.mapper.TagMapper;
+import com.tech.bee.postservice.repository.LinkRepository;
 import com.tech.bee.postservice.repository.PostRepository;
 import com.tech.bee.postservice.repository.TagRepository;
 import com.tech.bee.postservice.validator.PostValidator;
@@ -19,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -32,30 +34,31 @@ public class PostService {
     private final PostMapper postMapper;
     private final TagRepository tagRepository;
     private final PostRepository postRepository;
+    private final LinkRepository linkRepository;
     private final TagMapper tagMapper;
-    private final ReferenceMapper referenceMapper;
+    private final LinkMapper linkMapper;
 
+    @Transactional
     public String createPost(PostDTO postDTO){
         List<ErrorDTO> validationErrors = postValidator.validate(postDTO);
         if(CollectionUtils.isNotEmpty(validationErrors))
             throw BaseCustomException.builder().errors(validationErrors).httpStatus(HttpStatus.BAD_REQUEST).build();
         PostEntity postEntity = postMapper.toEntity(postDTO);
-        addTags(postEntity , postDTO);
-        addReferences(postEntity , postDTO);
+        Set<TagEntity> tags = fetchTags(postDTO);
+        if(CollectionUtils.isNotEmpty(tags)){
+            tags.forEach(tagEntity -> {
+                postEntity.getTags().add(tagEntity);
+            });
+        }
+        Set<LinkEntity> links = createLinks(postDTO);
+        if(CollectionUtils.isNotEmpty(links)){
+            links.forEach(linkEntity -> {
+                linkRepository.save(linkEntity);
+                postEntity.getLinks().add(linkEntity);
+            });
+        }
         postRepository.save(postEntity);
         return postEntity.getPostId();
-    }
-
-    private void addTags(PostEntity postEntity , PostDTO postDTO){
-        Set<TagEntity> tags = fetchTags(postDTO);
-        if(CollectionUtils.isNotEmpty(tags))
-            postEntity.getTags().addAll(tags);
-    }
-
-    private void addReferences(PostEntity postEntity , PostDTO postDTO){
-        List<ReferenceEntity> references = createReferences(postDTO);
-        if(CollectionUtils.isNotEmpty(references))
-            postEntity.getReferences().addAll(references);
     }
 
     Predicate<TagDTO> isEligibleForTagCreation =  (tagDTO -> {
@@ -64,23 +67,22 @@ public class PostService {
 
     private Set<TagEntity> fetchTags(PostDTO postDTO){
         if(CollectionUtils.isNotEmpty(postDTO.getTags())){
-            List<String> tagIdList = postDTO.getTags().stream().map(TagDTO::getTagId).collect(Collectors.toList());
+            List<String> tagIdList = postDTO.getTags().stream().map(TagDTO::getTagId)
+                    .filter(StringUtils::isNotEmpty).collect(Collectors.toList());
             List<String> newTagNames = postDTO.getTags().stream().filter(isEligibleForTagCreation)
                                     .map(TagDTO::getName).collect(Collectors.toList());
-            List<TagEntity> newTags = createNewTags(newTagNames);
-            Set<TagEntity> existingTags = tagRepository.findByTagIdIn(tagIdList);
-            existingTags.addAll(newTags);
-            return existingTags;
+            Set<TagEntity> tags = createNewTags(newTagNames);
+            if(CollectionUtils.isNotEmpty(tagIdList))
+                tags.addAll(tagRepository.findByTagIdIn(tagIdList));
+            return tags;
         }
         return null;
     }
-
-    private  List<TagEntity> createNewTags(List<String> tagNames){
-        return tagNames.stream().map(tagMapper::toEntity).collect(Collectors.toList());
+    private  Set<TagEntity> createNewTags(List<String> tagNames){
+        return tagNames.stream().map(tagMapper::toEntity).collect(Collectors.toSet());
     }
-
-    private List<ReferenceEntity> createReferences(PostDTO postDTO){
-        return postDTO.getReferences().stream().map(referenceMapper::toEntity).collect(Collectors.toList());
+    private Set<LinkEntity> createLinks(PostDTO postDTO){
+        return postDTO.getLinks().stream().map(linkMapper::toEntity).collect(Collectors.toSet());
     }
 
 }

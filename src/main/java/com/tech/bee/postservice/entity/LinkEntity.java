@@ -2,8 +2,8 @@ package com.tech.bee.postservice.entity;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -12,21 +12,18 @@ import java.util.UUID;
 @Data
 @NoArgsConstructor
 @Entity
-@Table(name = "references")
-public class ReferenceEntity {
+@Table(name = "links")
+public class LinkEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(name = "reference_id")
-    private String referenceId;
+    @Column(name = "link_id")
+    private String linkId;
     private String identifier = UUID.randomUUID().toString();
     private String content;
-    @ManyToOne
-    @JoinColumn(referencedColumnName = "post_id")
-    private PostEntity post;
     private String createdBy;
-    @CreatedDate
+    @CreationTimestamp
     private LocalDateTime createdWhen;
-    @LastModifiedDate
+    @UpdateTimestamp
     private LocalDateTime lastModifiedWhen;
 }
