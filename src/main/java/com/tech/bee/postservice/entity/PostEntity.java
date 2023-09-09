@@ -4,14 +4,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @Data
 @NoArgsConstructor
@@ -39,7 +35,8 @@ public class PostEntity {
     )
     private Set<TagEntity> tags = new HashSet<>();
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<LinkEntity> links = new HashSet<>();
+    @JoinColumn(name = "post_id")
+    private List<LinkEntity> links = new ArrayList<>();
     @CreationTimestamp
     private LocalDateTime createdWhen;
     @UpdateTimestamp

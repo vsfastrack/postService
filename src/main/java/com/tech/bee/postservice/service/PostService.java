@@ -9,8 +9,6 @@ import com.tech.bee.postservice.entity.TagEntity;
 import com.tech.bee.postservice.mapper.PostMapper;
 import com.tech.bee.postservice.mapper.LinkMapper;
 import com.tech.bee.postservice.mapper.TagMapper;
-import com.tech.bee.postservice.repository.LinkRepository;
-import com.tech.bee.postservice.repository.PostRepository;
 import com.tech.bee.postservice.repository.TagRepository;
 import com.tech.bee.postservice.validator.PostValidator;
 import com.tech.bee.postservice.exception.BaseCustomException;
@@ -20,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Set;
@@ -33,10 +32,10 @@ public class PostService {
     private final PostValidator postValidator;
     private final PostMapper postMapper;
     private final TagRepository tagRepository;
-    private final PostRepository postRepository;
-    private final LinkRepository linkRepository;
     private final TagMapper tagMapper;
     private final LinkMapper linkMapper;
+
+    private final EntityManager entityManager;
 
     @Transactional
     public String createPost(PostDTO postDTO){
@@ -53,13 +52,13 @@ public class PostService {
         Set<LinkEntity> links = createLinks(postDTO);
         if(CollectionUtils.isNotEmpty(links)){
             links.forEach(linkEntity -> {
-                linkRepository.save(linkEntity);
                 postEntity.getLinks().add(linkEntity);
             });
         }
-        postRepository.save(postEntity);
+        entityManager.persist(postEntity);
         return postEntity.getPostId();
     }
+
 
     Predicate<TagDTO> isEligibleForTagCreation =  (tagDTO -> {
         return StringUtils.isNotEmpty(tagDTO.getName()) && StringUtils.isEmpty(tagDTO.getTagId());

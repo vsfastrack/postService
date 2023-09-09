@@ -21,7 +21,6 @@ public class LinkEntity {
     private String linkId;
     private String identifier = UUID.randomUUID().toString();
     private String content;
-    private String createdBy;
     @CreationTimestamp
     private LocalDateTime createdWhen;
     @UpdateTimestamp
