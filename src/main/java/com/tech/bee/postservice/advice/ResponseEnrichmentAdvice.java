@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 @Aspect
 @Component
 public class ResponseEnrichmentAdvice {
-    @AfterReturning(pointcut = "execution(* com.tech.bee.post.service.resource.*.*(..))", returning = "response")
+    @AfterReturning(pointcut = "execution(* com.tech.bee.postservice.resources.*.*(..))", returning = "response")
     public void afterReturningFromController(ResponseEntity response) {
         // Set the timestamp in the response body
         if (response.getBody() instanceof ApiResponseDTO) {

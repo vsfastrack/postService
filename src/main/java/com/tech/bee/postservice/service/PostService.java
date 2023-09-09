@@ -56,7 +56,7 @@ public class PostService {
             });
         }
         entityManager.persist(postEntity);
-        return postEntity.getPostId();
+        return postEntity.getIdentifier();
     }
 
 

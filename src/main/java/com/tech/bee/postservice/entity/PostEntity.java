@@ -3,6 +3,7 @@ package com.tech.bee.postservice.entity;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.Type;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
@@ -25,6 +26,8 @@ public class PostEntity {
     private String category;
     private String series;
     private String link;
+    @Type(type = "text")
+    @Column(columnDefinition = "text")
     private String content;
     private String authorId;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)

@@ -21,6 +21,6 @@ public class TagResource {
     @GetMapping(value="/search")
     public ResponseEntity<ApiResponseDTO> findTagByName(@RequestParam("tagName") final String tagName){
         TagDTO tagDTO = tagService.findTagByName(tagName);
-        return new ResponseEntity<>(ApiResponseDTO.builder().content(tagDTO).build() , HttpStatus.CREATED);
+        return new ResponseEntity<>(ApiResponseDTO.builder().content(tagDTO).build() , HttpStatus.OK);
     }
 }
