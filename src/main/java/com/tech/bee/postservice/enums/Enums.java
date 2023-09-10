@@ -11,4 +11,8 @@ public class Enums {
     public enum ErrorCategory{
         VALIDATION_ERROR,BUSINESS_VALIDATION_ERROR
     }
+    @Getter
+    public enum SortDirection{
+        ASC,DESC
+    }
 }

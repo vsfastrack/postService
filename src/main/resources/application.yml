@@ -1,16 +1,6 @@
 spring:
   application:
     name: postService
-  profiles:
-    active: local
-  datasource:
-    username: postgres
-    url: jdbc:postgresql://techbee-cluster.cpeem5xmvx4h.ap-south-1.rds.amazonaws.com:5432/techbeeDb
-    driverClassName: org.postgresql.Driver
-    password: admin12345
-  jpa:
-    hibernate:
-      ddl-auto: update
 server:
   port: 8081
 management:

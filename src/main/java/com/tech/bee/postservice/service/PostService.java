@@ -1,20 +1,28 @@
 package com.tech.bee.postservice.service;
 
 import com.tech.bee.postservice.common.ErrorDTO;
+import com.tech.bee.postservice.common.PageResponseDTO;
+import com.tech.bee.postservice.dto.PostSearchDTO;
 import com.tech.bee.postservice.dto.PostDTO;
 import com.tech.bee.postservice.dto.TagDTO;
 import com.tech.bee.postservice.entity.PostEntity;
 import com.tech.bee.postservice.entity.LinkEntity;
 import com.tech.bee.postservice.entity.TagEntity;
+import com.tech.bee.postservice.enums.Enums;
 import com.tech.bee.postservice.mapper.PostMapper;
 import com.tech.bee.postservice.mapper.LinkMapper;
 import com.tech.bee.postservice.mapper.TagMapper;
+import com.tech.bee.postservice.repository.CustomRepository;
 import com.tech.bee.postservice.repository.TagRepository;
 import com.tech.bee.postservice.validator.PostValidator;
 import com.tech.bee.postservice.exception.BaseCustomException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +42,8 @@ public class PostService {
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
     private final LinkMapper linkMapper;
-
     private final EntityManager entityManager;
+    private final CustomRepository customRepository;
 
     @Transactional
     public String createPost(PostDTO postDTO){
@@ -59,6 +67,23 @@ public class PostService {
         return postEntity.getIdentifier();
     }
 
+    public PageResponseDTO findPosts(PostSearchDTO postSearchDTO , final int pageIndex ,
+                                     final int pageSize , final Enums.SortDirection sortDir ,
+                                     final String sortKey){
+        if(Enums.SortDirection.DESC == sortDir){
+            Sort sort = Sort.by(sortKey).descending();
+            Pageable pageable = PageRequest.of(pageIndex, pageSize ,sort);
+            Page<PostEntity> postPage = customRepository.findPosts(postSearchDTO , pageable);
+            List<PostDTO> posts = postPage.get().map(postMapper::toDto).collect(Collectors.toList());
+            return PageResponseDTO.builder().totalResults(postPage.getTotalElements()).results(posts).build();
+        }else{
+            Sort sort = Sort.by(sortKey).ascending();
+            Pageable pageable = PageRequest.of(pageIndex, pageSize ,sort);
+            Page<PostEntity> postPage = customRepository.findPosts(postSearchDTO , pageable);
+            List<PostDTO> posts = postPage.get().map(postMapper::toDto).collect(Collectors.toList());
+            return PageResponseDTO.builder().totalResults(postPage.getTotalElements()).results(posts).build();
+        }
+    }
 
     Predicate<TagDTO> isEligibleForTagCreation =  (tagDTO -> {
         return StringUtils.isNotEmpty(tagDTO.getName()) && StringUtils.isEmpty(tagDTO.getTagId());

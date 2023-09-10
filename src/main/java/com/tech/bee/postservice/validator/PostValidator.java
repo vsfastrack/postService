@@ -16,15 +16,15 @@ public class PostValidator {
 
     public List<ErrorDTO> validate(PostDTO postDTO){
         List<ErrorDTO> notificationErrors = new ArrayList<>();
-        validateTitle(postDTO , notificationErrors);
-        validateSubTitle(postDTO , notificationErrors);
-        validateContent(postDTO , notificationErrors);
-        validateAuthor(postDTO , notificationErrors);
-        validateTags(postDTO , notificationErrors);
+        validateTitle(postDTO, notificationErrors);
+        validateSubTitle(postDTO, notificationErrors);
+        validateContent(postDTO, notificationErrors);
+        validateAuthor(postDTO, notificationErrors);
+        validateTags(postDTO, notificationErrors);
         return notificationErrors;
     }
 
-    private void validateTitle(PostDTO postDTO , List<ErrorDTO> notificationErrors){
+    private void validateTitle(PostDTO postDTO, List<ErrorDTO> notificationErrors){
         if(StringUtils.isEmpty(postDTO.getTitle()))
             notificationErrors.add(ErrorDTO.builder()
                     .code(ApiConstants.ErrorCodeConstants.CODE_FIELD_CANNOT_BE_EMPTY)
@@ -33,7 +33,7 @@ public class PostValidator {
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
     }
 
-    private void validateSubTitle(PostDTO postDTO , List<ErrorDTO> notificationErrors){
+    private void validateSubTitle(PostDTO postDTO, List<ErrorDTO> notificationErrors){
         if(StringUtils.isEmpty(postDTO.getSubtitle()))
             notificationErrors.add(ErrorDTO.builder()
                     .code(ApiConstants.ErrorCodeConstants.CODE_FIELD_CANNOT_BE_EMPTY)
@@ -42,7 +42,7 @@ public class PostValidator {
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
     }
 
-    private void validateContent(PostDTO postDTO , List<ErrorDTO> notificationErrors){
+    private void validateContent(PostDTO postDTO, List<ErrorDTO> notificationErrors){
         if(StringUtils.isEmpty(postDTO.getContent()))
             notificationErrors.add(ErrorDTO.builder()
                     .code(ApiConstants.ErrorCodeConstants.CODE_FIELD_CANNOT_BE_EMPTY)
@@ -51,7 +51,7 @@ public class PostValidator {
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
     }
 
-    private void validateAuthor(PostDTO postDTO , List<ErrorDTO> notificationErrors){
+    private void validateAuthor(PostDTO postDTO, List<ErrorDTO> notificationErrors){
         if(StringUtils.isEmpty(postDTO.getAuthorId()))
             notificationErrors.add(ErrorDTO.builder()
                     .code(ApiConstants.ErrorCodeConstants.CODE_FIELD_CANNOT_BE_EMPTY)
@@ -60,7 +60,7 @@ public class PostValidator {
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
     }
 
-    private void validateTags(PostDTO postDTO , List<ErrorDTO> notificationErrors){
+    private void validateTags(PostDTO postDTO, List<ErrorDTO> notificationErrors){
         if(!CollectionUtils.isEmpty(postDTO.getTags())){
 
         }

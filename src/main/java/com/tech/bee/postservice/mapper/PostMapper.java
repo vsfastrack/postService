@@ -20,6 +20,17 @@ public interface PostMapper {
     @Mapping(expression = "java(toId(postDTO))" , target="postId")
     public PostEntity toEntity(PostDTO postDTO);
 
+    @Mapping(source = "title" , target = "title")
+    @Mapping(source = "subtitle" , target = "subtitle")
+    @Mapping(source = "content" , target = "content")
+    @Mapping(source = "authorId" , target = "authorId")
+    @Mapping(source = "series" , target = "series")
+    @Mapping(ignore = true, target = "links")
+    @Mapping(ignore = true, target = "tags")
+    @Mapping(source = "postId" , target="postId")
+    @Mapping(source = "identifier" , target="identifier")
+    public PostDTO toDto(PostEntity postEntity);
+
     default String toId(PostDTO postDTO){
         return AppUtil.generateIdentifier("PO");
     }

@@ -1,24 +1,24 @@
 package com.tech.bee.postservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.tech.bee.postservice.common.BaseSearchDTO;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
-public class PostDTO {
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class PostSearchDTO extends BaseSearchDTO {
     private String title;
-    private String postId;
-    private String identifier;
     private String subtitle;
-    private String link;
-    private String content;
+    private List<String> tags;
     private String category;
     private String series;
     private String authorId;
-    private List<TagDTO> tags;
-    private List<String> links;
+    private String createdWhenFrom;
+    private String createdWhenTo;
 }
