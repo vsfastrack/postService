@@ -1,6 +1,7 @@
 package com.tech.bee.postservice.util;
 
 import com.tech.bee.postservice.common.ErrorDTO;
+import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.enums.Enums;
 import lombok.experimental.UtilityClass;
 
@@ -18,9 +19,27 @@ public class AppUtil {
         return stringBuilder.append(prefix).append(finalIdentifier).toString();
     }
 
-    public ErrorDTO buildError(Enums.ErrorCategory category , String code , String message){
-        return ErrorDTO.builder().category(category)
+    private ErrorDTO buildError(Enums.ErrorCategory category , String key , String code , String message){
+        return ErrorDTO.builder().category(category).key(key)
                 .code(code).message(message).build();
+    }
+
+    public ErrorDTO buildResourceNotFoundError(String key){
+        return buildError(
+                Enums.ErrorCategory.BUSINESS_VALIDATION_ERROR ,
+                key,
+                ApiConstants.ErrorCodeConstants.CODE_RESOURCE_NOT_FOUND ,
+                ApiConstants.ErrorMsgConstants.MESSAGE_RESOURCE_NOT_FOUND
+        );
+    }
+
+    public ErrorDTO buildValidationErrorError(String key){
+        return buildError(
+                Enums.ErrorCategory.BUSINESS_VALIDATION_ERROR ,
+                key,
+                ApiConstants.ErrorCodeConstants.CODE_FIELD_CANNOT_BE_EMPTY ,
+                ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_CANNOT_BE_EMPTY
+        );
     }
 
 }

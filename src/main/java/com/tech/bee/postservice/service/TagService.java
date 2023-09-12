@@ -23,10 +23,7 @@ public class TagService {
     public TagDTO findTagByName(final String tagName){
         TagEntity tagEntity = tagRepository.findByNameIgnoreCase(tagName)
                 .orElseThrow( () -> BaseCustomException.builder().
-                 errors(Collections.singletonList(
-                         AppUtil.buildError(Enums.ErrorCategory.BUSINESS_VALIDATION_ERROR ,
-                                 ApiConstants.ErrorCodeConstants.CODE_RESOURCE_NOT_FOUND ,
-                                 ApiConstants.ErrorMsgConstants.MESSAGE_RESOURCE_NOT_FOUND)))
+                 errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_TAG)))
                          .build());
         return tagMapper.toDto(tagEntity);
     }

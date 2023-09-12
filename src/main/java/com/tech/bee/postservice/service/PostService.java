@@ -94,19 +94,23 @@ public class PostService {
     }
 
     public PostDTO getPostDetails(final String postIdentifier){
-        Optional<PostEntity> postEntity = postRepository.findByIdentifier(postIdentifier);
-        if(!postEntity.isPresent()){
-            ErrorDTO errorDTO = AppUtil.buildError(Enums.ErrorCategory.BUSINESS_VALIDATION_ERROR ,
-                    ApiConstants.ErrorCodeConstants.CODE_RESOURCE_NOT_FOUND ,
-                    ApiConstants.ErrorMsgConstants.MESSAGE_RESOURCE_NOT_FOUND);
-            throw BaseCustomException.builder().errors(Collections.singletonList(errorDTO)).httpStatus(HttpStatus.NOT_FOUND).build();
-        }
-        PostEntity post = postEntity.get();
+        PostEntity post = postRepository.findByIdentifier(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
+                errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST)))
+                .build());
         List<TagDTO> tags = post.getTags().stream().map(tagMapper::toDto).collect(Collectors.toList());
         List<String> links = post.getLinks().stream().map(LinkEntity::getContent).collect(Collectors.toList());
         return postMapper.toDto(post , tags , links);
     }
 
+    public void update(PostDTO postDTO , final String postIdentifier){
+        PostEntity existingPost =  postRepository.findByIdentifier(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
+                errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST)))
+                .build());
+        List<ErrorDTO> validationErrors = postValidator.validate(postDTO);
+        if(CollectionUtils.isNotEmpty(validationErrors))
+            throw BaseCustomException.builder().errors(validationErrors).httpStatus(HttpStatus.BAD_REQUEST).build();
+
+    }
     Predicate<TagDTO> isEligibleForTagCreation =  (tagDTO -> {
         return StringUtils.isNotEmpty(tagDTO.getName()) && StringUtils.isEmpty(tagDTO.getTagId());
     });

@@ -18,5 +18,7 @@ public class ApiConstants {
         public static final String KEY_SUB_TITLE="subtitle";
         public static final String KEY_CONTENT="content";
         public static final String KEY_AUTHOR="authorId";
+        public static final String KEY_TAG="tag";
+        public static final String KEY_POST="post";
     }
 }
