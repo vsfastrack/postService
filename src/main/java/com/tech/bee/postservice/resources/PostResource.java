@@ -6,6 +6,7 @@ import com.tech.bee.postservice.common.PageResponseDTO;
 import com.tech.bee.postservice.dto.PostSearchDTO;
 import com.tech.bee.postservice.dto.PostDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
+import com.tech.bee.postservice.entity.PostEntity;
 import com.tech.bee.postservice.enums.Enums;
 import com.tech.bee.postservice.service.PostService;
 import lombok.RequiredArgsConstructor;
@@ -38,5 +39,12 @@ public class PostResource {
         return new ResponseEntity<>(ApiResponseDTO.builder().content(
                 postService.findPosts(postSearchDTO , pageIndex , pageSize ,sortDir ,sortKey)).build()
                 , HttpStatus.OK);
+    }
+
+    @TransactionId
+    @GetMapping("/{postIdentifier}")
+    public ResponseEntity<ApiResponseDTO> findPostDetails(@PathVariable("postIdentifier") final String postIdentifier){
+        PostDTO postDTO = postService.getPostDetails(postIdentifier);
+        return new ResponseEntity<>(ApiResponseDTO.builder().content(postDTO).build(), HttpStatus.OK);
     }
 }

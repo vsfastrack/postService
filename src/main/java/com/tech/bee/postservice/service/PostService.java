@@ -2,6 +2,8 @@ package com.tech.bee.postservice.service;
 
 import com.tech.bee.postservice.common.ErrorDTO;
 import com.tech.bee.postservice.common.PageResponseDTO;
+import com.tech.bee.postservice.constants.ApiConstants;
+import com.tech.bee.postservice.dto.LinkDTO;
 import com.tech.bee.postservice.dto.PostSearchDTO;
 import com.tech.bee.postservice.dto.PostDTO;
 import com.tech.bee.postservice.dto.TagDTO;
@@ -13,12 +15,15 @@ import com.tech.bee.postservice.mapper.PostMapper;
 import com.tech.bee.postservice.mapper.LinkMapper;
 import com.tech.bee.postservice.mapper.TagMapper;
 import com.tech.bee.postservice.repository.CustomRepository;
+import com.tech.bee.postservice.repository.PostRepository;
 import com.tech.bee.postservice.repository.TagRepository;
+import com.tech.bee.postservice.util.AppUtil;
 import com.tech.bee.postservice.validator.PostValidator;
 import com.tech.bee.postservice.exception.BaseCustomException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.boot.actuate.endpoint.web.Link;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +33,9 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -44,6 +51,7 @@ public class PostService {
     private final LinkMapper linkMapper;
     private final EntityManager entityManager;
     private final CustomRepository customRepository;
+    private final PostRepository postRepository;
 
     @Transactional
     public String createPost(PostDTO postDTO){
@@ -83,6 +91,20 @@ public class PostService {
             List<PostDTO> posts = postPage.get().map(postMapper::toDto).collect(Collectors.toList());
             return PageResponseDTO.builder().totalResults(postPage.getTotalElements()).results(posts).build();
         }
+    }
+
+    public PostDTO getPostDetails(final String postIdentifier){
+        Optional<PostEntity> postEntity = postRepository.findByIdentifier(postIdentifier);
+        if(!postEntity.isPresent()){
+            ErrorDTO errorDTO = AppUtil.buildError(Enums.ErrorCategory.BUSINESS_VALIDATION_ERROR ,
+                    ApiConstants.ErrorCodeConstants.CODE_RESOURCE_NOT_FOUND ,
+                    ApiConstants.ErrorMsgConstants.MESSAGE_RESOURCE_NOT_FOUND);
+            throw BaseCustomException.builder().errors(Collections.singletonList(errorDTO)).httpStatus(HttpStatus.NOT_FOUND).build();
+        }
+        PostEntity post = postEntity.get();
+        List<TagDTO> tags = post.getTags().stream().map(tagMapper::toDto).collect(Collectors.toList());
+        List<String> links = post.getLinks().stream().map(LinkEntity::getContent).collect(Collectors.toList());
+        return postMapper.toDto(post , tags , links);
     }
 
     Predicate<TagDTO> isEligibleForTagCreation =  (tagDTO -> {

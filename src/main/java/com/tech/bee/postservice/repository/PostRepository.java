@@ -8,7 +8,10 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface PostRepository extends PagingAndSortingRepository<PostEntity, Long>, JpaSpecificationExecutor<PostEntity> {
     Page<PostEntity> findAll(Specification<PostEntity> spec, Pageable pageable);
+    Optional<PostEntity> findByIdentifier(String postIdentifier);
 }

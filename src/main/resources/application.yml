@@ -3,6 +3,9 @@ spring:
     name: postService
 server:
   port: 8081
+logbook:
+  format:
+    style: http
 management:
   endpoints:
     web:
