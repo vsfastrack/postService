@@ -47,4 +47,12 @@ public class PostResource {
         PostDTO postDTO = postService.getPostDetails(postIdentifier);
         return new ResponseEntity<>(ApiResponseDTO.builder().content(postDTO).build(), HttpStatus.OK);
     }
+
+    @TransactionId
+    @PatchMapping("/{postIdentifier}")
+    public ResponseEntity<ApiResponseDTO> updatePost(@PathVariable("postIdentifier") final String postIdentifier ,
+                                                     @RequestBody PostDTO postDTO){
+        postService.update(postDTO,postIdentifier);
+        return new ResponseEntity<>(ApiResponseDTO.builder().build(), HttpStatus.NO_CONTENT);
+    }
 }

@@ -46,6 +46,7 @@ public interface PostMapper {
     @Mapping(source = "links" , target="links")
     public PostDTO toDto(PostEntity postEntity , List<TagDTO> tags , List<String> links);
 
+
     default String toId(PostDTO postDTO){
         return AppUtil.generateIdentifier("PO");
     }

@@ -35,10 +35,19 @@ public class AppUtil {
 
     public ErrorDTO buildValidationErrorError(String key){
         return buildError(
-                Enums.ErrorCategory.BUSINESS_VALIDATION_ERROR ,
+                Enums.ErrorCategory.VALIDATION_ERROR ,
                 key,
                 ApiConstants.ErrorCodeConstants.CODE_FIELD_CANNOT_BE_EMPTY ,
                 ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_CANNOT_BE_EMPTY
+        );
+    }
+
+    public ErrorDTO buildResourceConflictError(String key){
+        return buildError(
+                Enums.ErrorCategory.BUSINESS_VALIDATION_ERROR ,
+                key,
+                ApiConstants.ErrorCodeConstants.CODE_RESOURCE_CONFLICT,
+                ApiConstants.ErrorMsgConstants.MESSAGE_RESOURCE_CONFLICT
         );
     }
 

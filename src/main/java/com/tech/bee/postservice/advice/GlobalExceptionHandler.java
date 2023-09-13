@@ -2,6 +2,7 @@ package com.tech.bee.postservice.advice;
 
 import com.tech.bee.postservice.common.ApiResponseDTO;
 import com.tech.bee.postservice.exception.BaseCustomException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;

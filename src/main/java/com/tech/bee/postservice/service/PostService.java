@@ -3,7 +3,6 @@ package com.tech.bee.postservice.service;
 import com.tech.bee.postservice.common.ErrorDTO;
 import com.tech.bee.postservice.common.PageResponseDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
-import com.tech.bee.postservice.dto.LinkDTO;
 import com.tech.bee.postservice.dto.PostSearchDTO;
 import com.tech.bee.postservice.dto.PostDTO;
 import com.tech.bee.postservice.dto.TagDTO;
@@ -35,7 +34,6 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -95,22 +93,49 @@ public class PostService {
 
     public PostDTO getPostDetails(final String postIdentifier){
         PostEntity post = postRepository.findByIdentifier(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
-                errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST)))
+                errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
                 .build());
         List<TagDTO> tags = post.getTags().stream().map(tagMapper::toDto).collect(Collectors.toList());
         List<String> links = post.getLinks().stream().map(LinkEntity::getContent).collect(Collectors.toList());
         return postMapper.toDto(post , tags , links);
     }
 
+    @Transactional
     public void update(PostDTO postDTO , final String postIdentifier){
         PostEntity existingPost =  postRepository.findByIdentifier(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
-                errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST)))
+                errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
                 .build());
-        List<ErrorDTO> validationErrors = postValidator.validate(postDTO);
+        List<ErrorDTO> validationErrors = postValidator.validatePatchRequest(postDTO);
         if(CollectionUtils.isNotEmpty(validationErrors))
             throw BaseCustomException.builder().errors(validationErrors).httpStatus(HttpStatus.BAD_REQUEST).build();
-
+        updatePost(existingPost,postDTO);
     }
+
+    private void updatePost(PostEntity existingPost , PostDTO patchDTO){
+        if(StringUtils.isNotEmpty(patchDTO.getTitle()))
+            existingPost.setTitle(patchDTO.getTitle());
+        if(StringUtils.isNotEmpty(patchDTO.getSubtitle()))
+            existingPost.setSubtitle(patchDTO.getSubtitle());
+        if(StringUtils.isNotEmpty(patchDTO.getCategory()))
+            existingPost.setCategory(patchDTO.getCategory());
+        if(StringUtils.isNotEmpty(patchDTO.getSeries()))
+            existingPost.setSeries(patchDTO.getSeries());
+        if(StringUtils.isNotEmpty(patchDTO.getContent()))
+            existingPost.setContent(patchDTO.getContent());
+        if(CollectionUtils.isNotEmpty(patchDTO.getTags())){
+            List<TagEntity> tags = patchDTO.getTags().stream().map(TagDTO::getName).map(tagMapper::toEntity).collect(Collectors.toList());
+            tags.forEach(tagEntity -> {
+                existingPost.getTags().add(tagEntity);
+            });
+        }
+        if(CollectionUtils.isNotEmpty(patchDTO.getLinks())){
+            List<LinkEntity> links = patchDTO.getLinks().stream().map(linkMapper::toEntity).collect(Collectors.toList());
+            links.forEach(link -> {
+                existingPost.getLinks().add(link);
+            });
+        }
+    }
+
     Predicate<TagDTO> isEligibleForTagCreation =  (tagDTO -> {
         return StringUtils.isNotEmpty(tagDTO.getName()) && StringUtils.isEmpty(tagDTO.getTagId());
     });
