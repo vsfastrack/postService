@@ -22,7 +22,6 @@ import com.tech.bee.postservice.exception.BaseCustomException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.boot.actuate.endpoint.web.Link;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -109,6 +108,13 @@ public class PostService {
         if(CollectionUtils.isNotEmpty(validationErrors))
             throw BaseCustomException.builder().errors(validationErrors).httpStatus(HttpStatus.BAD_REQUEST).build();
         updatePost(existingPost,postDTO);
+    }
+
+    public void delete(final String postIdentifier){
+        PostEntity existingPost =  postRepository.findByIdentifier(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
+                errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
+                .build());
+        existingPost.setDeleted(true);
     }
 
     private void updatePost(PostEntity existingPost , PostDTO patchDTO){

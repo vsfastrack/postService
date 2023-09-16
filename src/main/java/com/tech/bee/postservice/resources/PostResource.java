@@ -55,4 +55,11 @@ public class PostResource {
         postService.update(postDTO,postIdentifier);
         return new ResponseEntity<>(ApiResponseDTO.builder().build(), HttpStatus.NO_CONTENT);
     }
+
+    @TransactionId
+    @DeleteMapping("/{postIdentifier}")
+    public ResponseEntity<ApiResponseDTO> delete(@PathVariable("postIdentifier") final String postIdentifier){
+        postService.delete(postIdentifier);
+        return new ResponseEntity<>(ApiResponseDTO.builder().build(), HttpStatus.NO_CONTENT);
+    }
 }

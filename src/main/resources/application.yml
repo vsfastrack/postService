@@ -11,3 +11,5 @@ management:
     web:
       exposure:
         include: mappings
+liquibase:
+  outputFile: src/main/resources/db/db.changelog-master.xml

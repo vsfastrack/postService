@@ -1,0 +1,66 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="macvebs (generated)" id="1694785209684-1">
+        <createTable tableName="links">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="links_pkey"/>
+            </column>
+            <column name="content" type="VARCHAR(255)"/>
+            <column name="created_when" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="identifier" type="VARCHAR(255)"/>
+            <column name="last_modified_when" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="link_id" type="VARCHAR(255)"/>
+            <column name="post_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="macvebs (generated)" id="1694785209684-2">
+        <createTable tableName="post_tags">
+            <column name="post_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="post_tags_pkey"/>
+            </column>
+            <column name="tag_id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="post_tags_pkey"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="macvebs (generated)" id="1694785209684-3">
+        <createTable tableName="posts">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="posts_pkey"/>
+            </column>
+            <column name="author_id" type="VARCHAR(255)"/>
+            <column name="category" type="VARCHAR(255)"/>
+            <column name="content" type="TEXT"/>
+            <column name="created_when" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="identifier" type="VARCHAR(255)"/>
+            <column name="last_modified_when" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="link" type="VARCHAR(255)"/>
+            <column name="post_id" type="VARCHAR(255)"/>
+            <column name="series" type="VARCHAR(255)"/>
+            <column name="subtitle" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="macvebs (generated)" id="1694785209684-4">
+        <createTable tableName="tags">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="tags_pkey"/>
+            </column>
+            <column name="created_by" type="VARCHAR(255)"/>
+            <column name="created_when" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="identifier" type="VARCHAR(255)"/>
+            <column name="last_modified" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="tag_id" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="macvebs (generated)" id="1694785209684-5">
+        <addForeignKeyConstraint baseColumnNames="post_id" baseTableName="post_tags" constraintName="fkkifam22p4s1nm3bkmp1igcn5w" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="posts" validate="true"/>
+    </changeSet>
+    <changeSet author="macvebs (generated)" id="1694785209684-6">
+        <addForeignKeyConstraint baseColumnNames="tag_id" baseTableName="post_tags" constraintName="fkm6cfovkyqvu5rlm6ahdx3eavj" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="tags" validate="true"/>
+    </changeSet>
+    <changeSet author="macvebs (generated)" id="1694785209684-7">
+        <addForeignKeyConstraint baseColumnNames="post_id" baseTableName="links" constraintName="fkthb8bstqp5np97ycpsg5jj0p3" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="posts" validate="true"/>
+    </changeSet>
+</databaseChangeLog>
