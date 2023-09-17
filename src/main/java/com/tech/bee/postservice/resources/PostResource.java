@@ -50,7 +50,7 @@ public class PostResource {
 
     @TransactionId
     @PatchMapping("/{postIdentifier}")
-    public ResponseEntity<ApiResponseDTO> updatePost(@PathVariable("postIdentifier") final String postIdentifier ,
+    public ResponseEntity<ApiResponseDTO> update(@PathVariable("postIdentifier") final String postIdentifier ,
                                                      @RequestBody PostDTO postDTO){
         postService.update(postDTO,postIdentifier);
         return new ResponseEntity<>(ApiResponseDTO.builder().build(), HttpStatus.NO_CONTENT);

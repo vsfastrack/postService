@@ -1,11 +1,11 @@
 spring:
   datasource:
     username: postgres
-    url: jdbc:postgresql://localhost:5432/techbeeDb
+    url: jdbc:postgresql://localhost:5432/postDb
     driverClassName: org.postgresql.Driver
     password: admin12345
   jpa:
     hibernate:
-      ddl-auto: update
-liquibase:
-  changeLogFile: src/main/resources/db/db.changelog-master.xml
+      ddl-auto: none
+  liquibase:
+    changeLog: classpath:/db/changelog/db.changelog-master.xml

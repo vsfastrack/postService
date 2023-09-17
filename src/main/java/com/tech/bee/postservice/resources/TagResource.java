@@ -30,6 +30,23 @@ public class TagResource {
         return new ResponseEntity<>(ApiResponseDTO.builder().content(tagDTO).build() , HttpStatus.OK);
     }
 
+    @TransactionId
+    @GetMapping
+    public ResponseEntity<ApiResponseDTO> find(){
+        return new ResponseEntity<>(ApiResponseDTO.builder().content(tagService.findTags()).build() , HttpStatus.OK);
+    }
 
-
+    @TransactionId
+    @DeleteMapping("/{tagIdentifier}")
+    public ResponseEntity<ApiResponseDTO> delete(@PathVariable("tagIdentifier") final String tagIdentifier){
+        tagService.delete(tagIdentifier);
+        return new ResponseEntity<>(ApiResponseDTO.builder().build(), HttpStatus.NO_CONTENT);
+    }
+    @TransactionId
+    @PatchMapping("/{tagIdentifier}")
+    public ResponseEntity<ApiResponseDTO> update(@PathVariable("tagIdentifier") final String tagIdentifier,
+                                                            @RequestBody final TagDTO tagDTO){
+        tagService.update(tagIdentifier , tagDTO);
+        return new ResponseEntity<>(ApiResponseDTO.builder().build(), HttpStatus.NO_CONTENT);
+    }
 }

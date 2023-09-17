@@ -12,9 +12,11 @@ import java.util.Set;
 
 @Repository
 public interface TagRepository extends JpaRepository<TagEntity , Long>{
-    Set<TagEntity> findByTagIdIn(List<String> tagId);
+    Set<TagEntity> findAllByTagIdIn(List<String> tagId);
     @Query("SELECT t FROM TagEntity t WHERE UPPER(t.name) = UPPER(:name)")
     Optional<TagEntity> findByNameIgnoreCase(@Param("name") String name);
     List<TagEntity> findAllByIdentifierIn(List<String> tagIds);
     List<TagEntity> findAllByNameIn(List<String> tagNames);
+
+    Optional<TagEntity> findByIdentifier(String tagIdentifier);
 }

@@ -36,13 +36,15 @@ public class PostValidator {
 
     public List<ErrorDTO> validatePatchRequest(PostDTO postDTO){
         List<ErrorDTO> notificationErrors = new ArrayList<>();
-        validateTitle(postDTO, notificationErrors);
-        validateSubTitle(postDTO, notificationErrors);
-        validateContent(postDTO, notificationErrors);
+        validateTitleLength(postDTO, notificationErrors);
+        validateSubTitleLength(postDTO, notificationErrors);
+        validateContentLength(postDTO, notificationErrors);
         validateTags(postDTO, notificationErrors);
-        validateSeries(postDTO , notificationErrors);
+        validateSeriesLength(postDTO , notificationErrors);
         return notificationErrors;
     }
+
+
 
 
     private void validateTitle(PostDTO postDTO, List<ErrorDTO> notificationErrors){
@@ -52,11 +54,24 @@ public class PostValidator {
                     .message(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_CANNOT_BE_EMPTY)
                     .key(ApiConstants.KeyConstants.KEY_TITLE)
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
+        validateTitleLength(postDTO ,notificationErrors);
+    }
+
+    private void validateTitleLength(PostDTO postDTO , List<ErrorDTO> notificationErrors){
         if(StringUtils.isNotEmpty(postDTO.getTitle()) && StringUtils.length(postDTO.getTitle()) > 30)
             notificationErrors.add(ErrorDTO.builder()
                     .code(ApiConstants.ErrorCodeConstants.CODE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH)
                     .message(String.format(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH, "30"))
                     .key(ApiConstants.KeyConstants.KEY_TITLE)
+                    .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
+    }
+
+    private void validateSubTitleLength(PostDTO postDTO , List<ErrorDTO> notificationErrors){
+        if(StringUtils.isNotEmpty(postDTO.getSubtitle()) && StringUtils.length(postDTO.getSubtitle()) > 40)
+            notificationErrors.add(ErrorDTO.builder()
+                    .code(ApiConstants.ErrorCodeConstants.CODE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH)
+                    .message(String.format(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH, "40"))
+                    .key(ApiConstants.KeyConstants.KEY_SUB_TITLE)
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
     }
 
@@ -67,11 +82,15 @@ public class PostValidator {
                     .message(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_CANNOT_BE_EMPTY)
                     .key(ApiConstants.KeyConstants.KEY_SUB_TITLE)
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
-        if(StringUtils.isNotEmpty(postDTO.getSubtitle()) && StringUtils.length(postDTO.getSubtitle()) > 40)
+        validateSubTitleLength(postDTO , notificationErrors);
+    }
+
+    private void validateContentLength(PostDTO postDTO , List<ErrorDTO> notificationErrors){
+        if(StringUtils.isNotEmpty(postDTO.getContent()) && StringUtils.length(postDTO.getContent()) > 1000)
             notificationErrors.add(ErrorDTO.builder()
                     .code(ApiConstants.ErrorCodeConstants.CODE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH)
-                    .message(String.format(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH, "40"))
-                    .key(ApiConstants.KeyConstants.KEY_SUB_TITLE)
+                    .message(String.format(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH, "1000"))
+                    .key(ApiConstants.KeyConstants.KEY_CONTENT)
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
     }
 
@@ -82,11 +101,15 @@ public class PostValidator {
                     .message(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_CANNOT_BE_EMPTY)
                     .key(ApiConstants.KeyConstants.KEY_CONTENT)
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
-        if(StringUtils.isNotEmpty(postDTO.getContent()) && StringUtils.length(postDTO.getContent()) > 1000)
+        validateContentLength(postDTO , notificationErrors);
+    }
+
+    private void validateSeriesLength(PostDTO postDTO , List<ErrorDTO> notificationErrors){
+        if(StringUtils.isNotEmpty(postDTO.getSeries()) && StringUtils.length(postDTO.getSeries()) > 1000)
             notificationErrors.add(ErrorDTO.builder()
                     .code(ApiConstants.ErrorCodeConstants.CODE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH)
-                    .message(String.format(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH, "1000"))
-                    .key(ApiConstants.KeyConstants.KEY_CONTENT)
+                    .message(String.format(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH, "30"))
+                    .key(ApiConstants.KeyConstants.KEY_SERIES)
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
     }
 
@@ -102,12 +125,7 @@ public class PostValidator {
     private void validateSeries(PostDTO postDTO, List<ErrorDTO> notificationErrors){
         if(StringUtils.isEmpty(postDTO.getSeries()))
             notificationErrors.add(AppUtil.buildValidationErrorError(ApiConstants.KeyConstants.KEY_SERIES));
-        if(StringUtils.isNotEmpty(postDTO.getSeries()) && StringUtils.length(postDTO.getSeries()) > 1000)
-            notificationErrors.add(ErrorDTO.builder()
-                    .code(ApiConstants.ErrorCodeConstants.CODE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH)
-                    .message(String.format(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH, "30"))
-                    .key(ApiConstants.KeyConstants.KEY_SERIES)
-                    .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
+        validateSeriesLength(postDTO , notificationErrors);
     }
 
     private void validateTags(PostDTO postDTO, List<ErrorDTO> notificationErrors){
@@ -123,12 +141,17 @@ public class PostValidator {
                         .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
             List<String> tagNames = postDTO.getTags().stream().map(TagDTO::getName).collect(Collectors.toList());
             List<TagEntity> existingTags = tagRepository.findAllByNameIn(tagNames);
-            if(CollectionUtils.isNotEmpty(existingTags)){
-                notificationErrors.add(ErrorDTO.builder()
-                        .code(ApiConstants.ErrorCodeConstants.CODE_RESOURCE_CONFLICT)
-                        .message(ApiConstants.ErrorMsgConstants.MESSAGE_RESOURCE_CONFLICT)
-                        .key(existingTags.stream().map(TagEntity::getName).collect(Collectors.joining(",")))
-                        .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
+            List<String> existingTagNames = existingTags.stream().map(TagEntity::getName).collect(Collectors.toList());
+            List<String> newTagNames = tagNames.stream().filter(tagName -> !existingTagNames.contains(tagName)).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(newTagNames)){
+                newTagNames.forEach(newTagName -> {
+                    if(StringUtils.length(newTagName) > 30)
+                        notificationErrors.add(ErrorDTO.builder()
+                                .code(ApiConstants.ErrorCodeConstants.CODE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH)
+                                .message(String.format(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_VALUE_LENGTH_GREATER_THAN_DEFINED_LENGTH, "30"))
+                                .key(ApiConstants.KeyConstants.KEY_TAG_NAME +":"+newTagName)
+                                .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
+                });
             }
         }
     }

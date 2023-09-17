@@ -40,7 +40,6 @@ public class PostEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")
     private List<LinkEntity> links = new ArrayList<>();
-    private boolean deleted;
     @CreationTimestamp
     private LocalDateTime createdWhen;
     @UpdateTimestamp

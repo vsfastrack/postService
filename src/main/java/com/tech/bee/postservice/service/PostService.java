@@ -31,9 +31,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -68,7 +66,8 @@ public class PostService {
                 postEntity.getLinks().add(linkEntity);
             });
         }
-        entityManager.persist(postEntity);
+        postEntity.setIdentifier(UUID.randomUUID().toString());
+        postRepository.save(postEntity);
         return postEntity.getIdentifier();
     }
 
@@ -114,32 +113,14 @@ public class PostService {
         PostEntity existingPost =  postRepository.findByIdentifier(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
                 errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
                 .build());
-        existingPost.setDeleted(true);
+        existingPost.getTags().clear();
+        postRepository.save(existingPost);
+        postRepository.delete(existingPost);
     }
 
     private void updatePost(PostEntity existingPost , PostDTO patchDTO){
-        if(StringUtils.isNotEmpty(patchDTO.getTitle()))
-            existingPost.setTitle(patchDTO.getTitle());
-        if(StringUtils.isNotEmpty(patchDTO.getSubtitle()))
-            existingPost.setSubtitle(patchDTO.getSubtitle());
-        if(StringUtils.isNotEmpty(patchDTO.getCategory()))
-            existingPost.setCategory(patchDTO.getCategory());
-        if(StringUtils.isNotEmpty(patchDTO.getSeries()))
-            existingPost.setSeries(patchDTO.getSeries());
-        if(StringUtils.isNotEmpty(patchDTO.getContent()))
-            existingPost.setContent(patchDTO.getContent());
-        if(CollectionUtils.isNotEmpty(patchDTO.getTags())){
-            List<TagEntity> tags = patchDTO.getTags().stream().map(TagDTO::getName).map(tagMapper::toEntity).collect(Collectors.toList());
-            tags.forEach(tagEntity -> {
-                existingPost.getTags().add(tagEntity);
-            });
-        }
-        if(CollectionUtils.isNotEmpty(patchDTO.getLinks())){
-            List<LinkEntity> links = patchDTO.getLinks().stream().map(linkMapper::toEntity).collect(Collectors.toList());
-            links.forEach(link -> {
-                existingPost.getLinks().add(link);
-            });
-        }
+        AppUtil.mergeObjectsWithProperties(patchDTO , existingPost ,
+                Arrays.asList("title" , "subtitle" ,"category","series","content"));
     }
 
     Predicate<TagDTO> isEligibleForTagCreation =  (tagDTO -> {
@@ -148,14 +129,22 @@ public class PostService {
 
     private Set<TagEntity> fetchTags(PostDTO postDTO){
         if(CollectionUtils.isNotEmpty(postDTO.getTags())){
+            Set<TagEntity> resultTags = new HashSet<>();
             List<String> tagIdList = postDTO.getTags().stream().map(TagDTO::getTagId)
                     .filter(StringUtils::isNotEmpty).collect(Collectors.toList());
-            List<String> newTagNames = postDTO.getTags().stream().filter(isEligibleForTagCreation)
-                                    .map(TagDTO::getName).collect(Collectors.toList());
-            Set<TagEntity> tags = createNewTags(newTagNames);
-            if(CollectionUtils.isNotEmpty(tagIdList))
-                tags.addAll(tagRepository.findByTagIdIn(tagIdList));
-            return tags;
+            List<String> tagNameList = postDTO.getTags().stream().map(TagDTO::getName).collect(Collectors.toList());
+            if(CollectionUtils.isNotEmpty(tagIdList)){
+                Set<TagEntity> existingTags = tagRepository.findAllByTagIdIn(tagIdList);
+                resultTags.addAll(existingTags);
+            }
+            if(CollectionUtils.isNotEmpty(tagNameList)){
+                List<TagEntity> existingTags = tagRepository.findAllByNameIn(tagNameList);
+                resultTags.addAll(existingTags);
+                List<String> existingTagNames = existingTags.stream().map(TagEntity::getName).collect(Collectors.toList());
+                List<String> newTags = tagNameList.stream().filter(newTag -> !existingTagNames.contains(newTag)).collect(Collectors.toList());
+                resultTags.addAll(createNewTags(newTags));
+            }
+            return resultTags;
         }
         return null;
     }

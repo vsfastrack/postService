@@ -48,6 +48,8 @@ dependencies {
 	implementation group: 'org.zalando', name: 'logbook-spring-boot-starter', version: '3.4.0'
 	implementation 'org.liquibase:liquibase-core:4.19.1'
 	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.4'
+	implementation 'org.yaml:snakeyaml:1.32'
 }
 
 tasks.named('test') {
@@ -68,25 +70,30 @@ task generateSqlChangeSets(type: Exec) {
 	dependsOn 'classes' // Ensure classes are compiled before generating SQL
 		def activeProfiles = System.getProperty('spring.profiles.active')
 		println "Active Profiles ======= ${activeProfiles}"
-		def applicationProperties = new Properties()
-		if (activeProfiles.contains('local')) {
-			file('src/main/resources/application-local.yml').withInputStream { inputStream ->
-				applicationProperties.load(inputStream)
+		if(activeProfiles){
+			def applicationProperties = new Properties()
+			if (activeProfiles.contains('local')) {
+				file('src/main/resources/application-local.yml').withInputStream { inputStream ->
+					applicationProperties.load(inputStream)
+				}
 			}
+			applicationProperties.forEach((key,value)->{
+				println "===== ${key}:${value}===="
+			})
+			def changeLogFile = applicationProperties.getProperty('changeLog')
+			def dataSourceUrl = applicationProperties.getProperty('url')
+			def dataSourceUserName = applicationProperties.getProperty('username')
+			def dataSourcePassword = applicationProperties.getProperty('password')
+			println "=== Genetaing SQl changelog =="
+			commandLine 'java', '-cp', sourceSets.main.runtimeClasspath.asPath,
+					'liquibase.integration.commandline.Main',
+					"--changeLogFile=${changeLogFile}", // Replace with your changelog file path
+					"--url=${dataSourceUrl}",
+					"--username=${dataSourceUserName}",
+					"--password=${dataSourcePassword}",
+					'--driver=org.postgresql.Driver',
+					'updateSQL'
+			workingDir project.projectDir
+			println "=== SQl changelog generated =="
 		}
-		def changeLogFile = applicationProperties.getProperty('changeLogFile')
-		def dataSourceUrl = applicationProperties.getProperty('url')
-		def dataSourceUserName = applicationProperties.getProperty('username')
-		def dataSourcePassword = applicationProperties.getProperty('password')
-		println "=== Genetaing SQl changelog =="
-		commandLine 'java', '-cp', sourceSets.main.runtimeClasspath.asPath,
-				'liquibase.integration.commandline.Main',
-				"--changeLogFile=${changeLogFile}", // Replace with your changelog file path
-				"--url=${dataSourceUrl}",
-				"--username=${dataSourceUserName}",
-				"--password=${dataSourcePassword}",
-				'--driver=org.postgresql.Driver',
-				'updateSQL'
-		workingDir project.projectDir
-		println "=== SQl changelog generated =="
 }
