@@ -63,4 +63,11 @@
     <changeSet author="macvebs (generated)" id="1694785209684-7">
         <addForeignKeyConstraint baseColumnNames="post_id" baseTableName="links" constraintName="fkthb8bstqp5np97ycpsg5jj0p3" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="posts" validate="true"/>
     </changeSet>
+    <changeSet author="macvebs (generated)" id="1">
+        <addColumn schemaName= "public"
+                   tableName="posts">
+            <column name="created_by"
+                    type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

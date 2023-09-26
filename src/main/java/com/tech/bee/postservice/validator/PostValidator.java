@@ -1,12 +1,13 @@
 package com.tech.bee.postservice.validator;
 
 import com.tech.bee.postservice.common.ErrorDTO;
+import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.dto.PostDTO;
 import com.tech.bee.postservice.dto.TagDTO;
 import com.tech.bee.postservice.entity.TagEntity;
 import com.tech.bee.postservice.enums.Enums;
-import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.repository.TagRepository;
+import com.tech.bee.postservice.service.SecurityService;
 import com.tech.bee.postservice.util.AppUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class PostValidator {
 
     private final TagRepository tagRepository;
+    private final SecurityService securityService;
 
     public List<ErrorDTO> validate(PostDTO postDTO){
         List<ErrorDTO> notificationErrors = new ArrayList<>();

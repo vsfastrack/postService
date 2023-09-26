@@ -3,22 +3,22 @@ package com.tech.bee.postservice.service;
 import com.tech.bee.postservice.common.ErrorDTO;
 import com.tech.bee.postservice.common.PageResponseDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
-import com.tech.bee.postservice.dto.PostSearchDTO;
 import com.tech.bee.postservice.dto.PostDTO;
+import com.tech.bee.postservice.dto.PostSearchDTO;
 import com.tech.bee.postservice.dto.TagDTO;
-import com.tech.bee.postservice.entity.PostEntity;
 import com.tech.bee.postservice.entity.LinkEntity;
+import com.tech.bee.postservice.entity.PostEntity;
 import com.tech.bee.postservice.entity.TagEntity;
 import com.tech.bee.postservice.enums.Enums;
-import com.tech.bee.postservice.mapper.PostMapper;
+import com.tech.bee.postservice.exception.BaseCustomException;
 import com.tech.bee.postservice.mapper.LinkMapper;
+import com.tech.bee.postservice.mapper.PostMapper;
 import com.tech.bee.postservice.mapper.TagMapper;
 import com.tech.bee.postservice.repository.CustomRepository;
 import com.tech.bee.postservice.repository.PostRepository;
 import com.tech.bee.postservice.repository.TagRepository;
 import com.tech.bee.postservice.util.AppUtil;
 import com.tech.bee.postservice.validator.PostValidator;
-import com.tech.bee.postservice.exception.BaseCustomException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,7 +29,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.function.Predicate;
@@ -44,9 +43,9 @@ public class PostService {
     private final TagRepository tagRepository;
     private final TagMapper tagMapper;
     private final LinkMapper linkMapper;
-    private final EntityManager entityManager;
     private final CustomRepository customRepository;
     private final PostRepository postRepository;
+    private final SecurityService securityService;
 
     @Transactional
     public String createPost(PostDTO postDTO){
@@ -67,6 +66,7 @@ public class PostService {
             });
         }
         postEntity.setIdentifier(UUID.randomUUID().toString());
+        postEntity.setCreatedBy(securityService.getCurrentLoggedInUser());
         postRepository.save(postEntity);
         return postEntity.getIdentifier();
     }
@@ -106,6 +106,9 @@ public class PostService {
         List<ErrorDTO> validationErrors = postValidator.validatePatchRequest(postDTO);
         if(CollectionUtils.isNotEmpty(validationErrors))
             throw BaseCustomException.builder().errors(validationErrors).httpStatus(HttpStatus.BAD_REQUEST).build();
+        List<ErrorDTO> ownershipErrors = securityService.validateOwnership(existingPost.getCreatedBy());
+        if(CollectionUtils.isNotEmpty(ownershipErrors))
+            throw BaseCustomException.builder().errors(ownershipErrors).httpStatus(HttpStatus.FORBIDDEN).build();
         updatePost(existingPost,postDTO);
     }
 
@@ -113,6 +116,9 @@ public class PostService {
         PostEntity existingPost =  postRepository.findByIdentifier(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
                 errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
                 .build());
+        List<ErrorDTO> ownershipErrors = securityService.validateOwnership(existingPost.getCreatedBy());
+        if(CollectionUtils.isNotEmpty(ownershipErrors))
+            throw BaseCustomException.builder().errors(ownershipErrors).httpStatus(HttpStatus.FORBIDDEN).build();
         existingPost.getTags().clear();
         postRepository.save(existingPost);
         postRepository.delete(existingPost);
@@ -122,10 +128,6 @@ public class PostService {
         AppUtil.mergeObjectsWithProperties(patchDTO , existingPost ,
                 Arrays.asList("title" , "subtitle" ,"category","series","content"));
     }
-
-    Predicate<TagDTO> isEligibleForTagCreation =  (tagDTO -> {
-        return StringUtils.isNotEmpty(tagDTO.getName()) && StringUtils.isEmpty(tagDTO.getTagId());
-    });
 
     private Set<TagEntity> fetchTags(PostDTO postDTO){
         if(CollectionUtils.isNotEmpty(postDTO.getTags())){
@@ -152,7 +154,9 @@ public class PostService {
         return tagNames.stream().map(tagMapper::toEntity).collect(Collectors.toSet());
     }
     private Set<LinkEntity> createLinks(PostDTO postDTO){
-        return postDTO.getLinks().stream().map(linkMapper::toEntity).collect(Collectors.toSet());
+        return (CollectionUtils.isNotEmpty(postDTO.getLinks())) ?
+                postDTO.getLinks().stream().map(linkMapper::toEntity).collect(Collectors.toSet()) :
+                null;
     }
 
 }

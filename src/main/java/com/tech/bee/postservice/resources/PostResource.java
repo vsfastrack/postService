@@ -12,6 +12,7 @@ import com.tech.bee.postservice.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,6 +24,7 @@ public class PostResource {
 
     @TransactionId
     @PostMapping
+    @Secured(ApiConstants.RoleConstants.ROLE_AUTHOR)
     public ResponseEntity<ApiResponseDTO> create(@RequestBody PostDTO postDTO){
         String postId = postService.createPost(postDTO);
         return new ResponseEntity<>(ApiResponseDTO.builder().content(postId).build() , HttpStatus.CREATED);
@@ -30,6 +32,7 @@ public class PostResource {
 
     @TransactionId
     @GetMapping("/search")
+    @Secured(ApiConstants.RoleConstants.ROLE_USER)
     public ResponseEntity<ApiResponseDTO> find(@RequestBody PostSearchDTO postSearchDTO ,
                                                @RequestParam(name = "pageIndex" , defaultValue = "0") final int pageIndex ,
                                                @RequestParam(name = "pageSize", defaultValue = "10") final int pageSize ,
@@ -43,6 +46,7 @@ public class PostResource {
 
     @TransactionId
     @GetMapping("/{postIdentifier}")
+    @Secured(ApiConstants.RoleConstants.ROLE_USER)
     public ResponseEntity<ApiResponseDTO> findPostDetails(@PathVariable("postIdentifier") final String postIdentifier){
         PostDTO postDTO = postService.getPostDetails(postIdentifier);
         return new ResponseEntity<>(ApiResponseDTO.builder().content(postDTO).build(), HttpStatus.OK);
@@ -50,6 +54,7 @@ public class PostResource {
 
     @TransactionId
     @PatchMapping("/{postIdentifier}")
+    @Secured(ApiConstants.RoleConstants.ROLE_AUTHOR)
     public ResponseEntity<ApiResponseDTO> update(@PathVariable("postIdentifier") final String postIdentifier ,
                                                      @RequestBody PostDTO postDTO){
         postService.update(postDTO,postIdentifier);
@@ -58,6 +63,7 @@ public class PostResource {
 
     @TransactionId
     @DeleteMapping("/{postIdentifier}")
+    @Secured(ApiConstants.RoleConstants.ROLE_AUTHOR)
     public ResponseEntity<ApiResponseDTO> delete(@PathVariable("postIdentifier") final String postIdentifier){
         postService.delete(postIdentifier);
         return new ResponseEntity<>(ApiResponseDTO.builder().build(), HttpStatus.NO_CONTENT);
