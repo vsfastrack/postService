@@ -1,6 +1,16 @@
 spring:
   application:
     name: postService
+  datasource:
+    username: postgres
+    url: jdbc:postgresql://localhost:5432/postDb
+    driverClassName: org.postgresql.Driver
+    password: admin12345
+  jpa:
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    changeLog: classpath:/db/changelog/db.changelog-master.xml
 server:
   port: 8081
 keycloak:
@@ -17,9 +27,8 @@ logbook:
   format:
     style: http
 management:
-  endpoints:
-    web:
-      exposure:
-        include: mappings
+  endpoint:
+    health:
+      show-details: always
   liquibase:
     changeLog: classpath:/db/changelog/db.changelog-master.xml

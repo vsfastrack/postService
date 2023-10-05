@@ -1,9 +1,21 @@
 spring:
   datasource:
     username: postgres
-    url: jdbc:postgresql://techbee-cluster.cpeem5xmvx4h.ap-south-1.rds.amazonaws.com:5432/techbeeDb
+    url: jdbc:postgresql://postsdb.cpeem5xmvx4h.ap-south-1.rds.amazonaws.com:5432/postsDb
     driverClassName: org.postgresql.Driver
     password: admin12345
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
+  liquibase:
+    changeLog: classpath:/db/changelog/db.changelog-master.xml
+keycloak:
+  enabled: true
+  auth-server-url: http://keycloak-service:8080
+  credentials:
+    secret: ukJqOiJRvORyrDGf1ARqcN9VQHwv9H18
+  ssl-required: external
+  realm: techbee
+  resource: post_service_client
+  bearer-only: true
+  use-resource-role-mappings: false

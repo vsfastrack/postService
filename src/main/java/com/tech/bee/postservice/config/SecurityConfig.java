@@ -64,7 +64,7 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .sessionAuthenticationStrategy(sessionAuthenticationStrategy())
                 .and()
                 .authorizeRequests()
-//                .antMatchers("/auth/**").permitAll()
+                .antMatchers("/actuator/health").permitAll()
                 .anyRequest().authenticated();
     }
 }

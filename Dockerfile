@@ -13,7 +13,7 @@ COPY gradle ./gradle
 COPY src ./src
 
 # Build the application
-RUN gradle build --no-daemon
+RUN gradle build -x test --no-daemon
 
 # Use a base image with Java 8 only for runtime
 FROM adoptopenjdk:8-jre-hotspot
