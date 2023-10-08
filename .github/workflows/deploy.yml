@@ -26,13 +26,13 @@ jobs:
         run: docker buildx build --file Dockerfile --output type=image,name=${{ secrets.DOCKER_USERNAME }}/tech-bee:post-service-latest .
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/my-spring-app:latest
+        run: docker push ${{ secrets.DOCKER_USERNAME }}/tech-bee:post-service-latest
 
       - name: Configure kubectl
-        uses: steebchen/kubectl-setup@v1
-        with:
-          kubectl-version: 'latest'
-          kubectl-credentials: ${{ secrets.KUBECONFIG }}
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+          kubectl config set-context my-kubeconfig --kubeconfig=kubeconfig.yaml
+          kubectl config use-context my-kubeconfig
 
       - name: Deploy to Kubernetes
         run: kubectl apply -f k8s/deployment.yaml
