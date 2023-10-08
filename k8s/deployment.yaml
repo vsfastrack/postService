@@ -6,7 +6,7 @@ metadata:
   name: post-service
   namespace: default
 spec:
-  replicas: 1 #CHANGE
+  replicas: 2 #CHANGE
   minReadySeconds: 45
   selector:
     matchLabels:
@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
       - image: vebstechbee03/tech-bee:post-service-latest
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         name: post-service
         ports:
         - name: liveness-port
@@ -54,21 +54,3 @@ spec:
             value: uat
       restartPolicy: Always
       terminationGracePeriodSeconds: 30
----
-apiVersion: v1
-kind: Service
-metadata:
-  labels: #PODS
-    app: post-service
-  name: post-service
-  namespace: default
-spec:
-  ports:
-  - # nodePort: 30702 #CHANGE
-    port: 8081 #CHANGE
-    protocol: TCP
-    targetPort: 8081 #CHANGE
-  selector:
-    app: post-service
-  sessionAffinity: None #CHANGE
-  type: LoadBalancer

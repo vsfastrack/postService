@@ -11,7 +11,7 @@ spring:
     changeLog: classpath:/db/changelog/db.changelog-master.xml
 keycloak:
   enabled: true
-  auth-server-url: http://keycloak-service:8080
+  auth-server-url: http://auth-server:8080
   credentials:
     secret: ukJqOiJRvORyrDGf1ARqcN9VQHwv9H18
   ssl-required: external
