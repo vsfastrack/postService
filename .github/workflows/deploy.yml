@@ -38,14 +38,7 @@ jobs:
         run: mkdir -p $HOME/.kube
 
       - name: Setup kubectl
-        run: echo "$KUBECONFIG" | base64 -d > $HOME/.kube/config
-
-      - name: Debug KUBECONFIG
-        run: |
-          echo "KUBECONFIG Content:"
-          echo "$KUBECONFIG" | base64 -d"
-          echo "Content of ~/.kube/config:"
-          cat $HOME/.kube/config
+        run: echo ${{ secrets.KUBECONFIG }} | base64 -d > $HOME/.kube/config
 
       - name: k8s deployment
         run: kubectl apply -f k8s/deployment.yaml
