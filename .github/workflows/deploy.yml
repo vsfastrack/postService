@@ -14,6 +14,12 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
+      - name: Set up Google Cloud CLI
+        uses: GoogleCloudPlatform/github-actions/setup-gcloud@v0.2.0
+        with:
+          service_account_key: ${{ secrets.GCLOUD_AUTH_KEY }}
+          project_id: banded-pad-397603
+
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
