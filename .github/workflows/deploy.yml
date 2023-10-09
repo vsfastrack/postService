@@ -23,7 +23,10 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build Docker image
-        run: docker buildx build --file Dockerfile --output type=image,name=${{ secrets.DOCKER_USERNAME }}/tech-bee:post-service-latest .
+        run: docker build -t post-service:latest .
+
+      - name: Tag Docker image
+        run: docker tag post-service:latest ${{ secrets.DOCKER_USERNAME }}/tech-bee:post-service-latest
 
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/tech-bee:post-service-latest
