@@ -31,11 +31,14 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/tech-bee:post-service-latest
 
-      - name: Configure kubectl
-        run: |
-          echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
-          kubectl config set-context my-kubeconfig --kubeconfig=kubeconfig.yaml
-          kubectl config use-context my-kubeconfig
+      - name: Kube Tools
+        uses: yokawasa/action-setup-kube-tools@v0.9.2
+        with:
+          kubectl: '1.22.0'
 
-      - name: Deploy to Kubernetes
-        run: kubectl apply -f k8s/deployment.yaml
+      - name: k8s deployment
+        shell:  bash
+        run: |
+          CLUSTER_NAME=${{ secrets.CLUSTER_NAME }}
+          kubectl config set-context ${CLUSTER_NAME} 
+          kubectl apply -f k8s/deployment.yaml
