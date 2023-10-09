@@ -43,7 +43,7 @@ jobs:
       - name: Debug KUBECONFIG
         run: |
           echo "KUBECONFIG Content:"
-          echo "$KUBECONFIG" | base64 -d
+          echo "$KUBECONFIG" | base64 -d"
           echo "Content of ~/.kube/config:"
           cat $HOME/.kube/config
 
