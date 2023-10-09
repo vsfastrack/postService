@@ -36,6 +36,9 @@ jobs:
         with:
           kubectl: '1.22.0'
 
+      - name: Create kubeconfig directory
+        run: mkdir -p $HOME/.kube
+
       - name: Configure kubectl
         run: echo "$KUBECONFIG" | base64 -d > $HOME/.kube/config
 
