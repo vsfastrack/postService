@@ -46,7 +46,7 @@ jobs:
       - name: Configure kubectl
         run: |
           gcloud container clusters get-credentials techbee-cluster --zone us-central1-c
-          kubectl config use-context techbee-cluster
+          kubectl config use-context gke_banded-pad-397603_us-central1-c_techbee-cluster
 
       - name: k8s deployment
         run: kubectl apply -f k8s/deployment.yaml
