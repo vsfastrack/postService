@@ -43,8 +43,10 @@ jobs:
       - name: Create kubeconfig directory
         run: mkdir -p $HOME/.kube
 
-      - name: Setup kubectl
-        run: echo ${{ secrets.KUBECONFIG }} | base64 -d > $HOME/.kube/config
+      - name: Configure kubectl
+        run: |
+          gcloud container clusters get-credentials ${{ secrets.CLUSTER_NAME }} --zone us-central1-c
+          kubectl config use-context ${{ secrets.CLUSTER_NAME }}
 
       - name: k8s deployment
         run: kubectl apply -f k8s/deployment.yaml
