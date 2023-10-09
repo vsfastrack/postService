@@ -1,10 +1,8 @@
 name: Deploy to Kubernetes
-
 on:
   push:
     branches:
       - main
-
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -39,8 +37,15 @@ jobs:
       - name: Create kubeconfig directory
         run: mkdir -p $HOME/.kube
 
-      - name: Configure kubectl
+      - name: Setup kubectl
         run: echo "$KUBECONFIG" | base64 -d > $HOME/.kube/config
+
+      - name: Debug KUBECONFIG
+        run: |
+          echo "KUBECONFIG Content:"
+          echo "$KUBECONFIG" | base64 -d
+          echo "Content of ~/.kube/config:"
+          cat $HOME/.kube/config
 
       - name: k8s deployment
         run: kubectl apply -f k8s/deployment.yaml
