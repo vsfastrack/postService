@@ -42,6 +42,10 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_USERNAME }}/tech-bee:post-service-latest
 
-      - name: Deploy to GKE
+      - name: Configure kubectl
         run: |
-          kubectl apply -f your-deployment.yaml
+          gcloud container clusters get-credentials techbee-cluster --zone us-central1-c
+          kubectl config use-context gke_banded-pad-397603_us-central1-c_techbee-cluster
+
+      - name: k8s deployment
+        run: kubectl apply -f k8s/deployment.yaml
