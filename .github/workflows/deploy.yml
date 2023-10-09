@@ -36,9 +36,8 @@ jobs:
         with:
           kubectl: '1.22.0'
 
+      - name: Configure kubectl
+        run: echo "$KUBECONFIG" | base64 -d > $HOME/.kube/config
+
       - name: k8s deployment
-        shell:  bash
-        run: |
-          CLUSTER_NAME=${{ secrets.CLUSTER_NAME }}
-          kubectl config set-context ${CLUSTER_NAME} 
-          kubectl apply -f k8s/deployment.yaml
+        run: kubectl apply -f k8s/deployment.yaml
