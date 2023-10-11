@@ -48,7 +48,7 @@ jobs:
           kubectl config use-context gke_banded-pad-397603_us-central1-c_techbee-cluster
 
       - name: Delete existing deployment
-        run: kubectl delete deployments post-service
+        run: kubectl delete deployment post-service --ignore-not-found=true
 
       - name: k8s deployment
         run: kubectl apply -f k8s/deployment.yaml
