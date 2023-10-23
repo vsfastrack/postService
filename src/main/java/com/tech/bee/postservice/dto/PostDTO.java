@@ -11,14 +11,15 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class PostDTO {
     private String title;
+    private String subtitle;
+    private String description;
+    private String series;
+    private String category;
+    private String content;
+    private List<TagDTO> tags;
+    private String authorId;
     private String postId;
     private String identifier;
-    private String subtitle;
     private String link;
-    private String content;
-    private String category;
-    private String series;
-    private String authorId;
-    private List<TagDTO> tags;
     private List<String> links;
 }
