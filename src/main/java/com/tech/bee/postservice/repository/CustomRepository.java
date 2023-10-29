@@ -55,4 +55,8 @@ public class CustomRepository {
         Specification<PostEntity> specification = findPostsWithSearchCriteria(postSearchDTO);
         return postRepository.findAll(specification , pageable);
     }
+
+    public Page<PostEntity> findPosts(Pageable pageable){
+        return postRepository.findAll(pageable);
+    }
 }

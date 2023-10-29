@@ -70,4 +70,71 @@
                     type="varchar(255)"/>
         </addColumn>
     </changeSet>
+    <changeSet author="Vebs" id="2">
+        <addColumn schemaName= "public"
+                   tableName="posts">
+            <column name="description"
+                    type="TEXT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="Vebs" id="3">
+        <addColumn schemaName= "public"
+                   tableName="posts">
+            <column name="likes"
+                    type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="Vebs" id="4">
+        <addColumn schemaName= "public"
+                   tableName="posts">
+            <column name="readMinutes"
+                    type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="Vebs" id="5">
+        <addColumn schemaName= "public"
+                   tableName="posts">
+            <column name="viewedBy"
+                    type="BIGINT"/>
+        </addColumn>
+    </changeSet>
+    <changeSet author="Vebs" id="6">
+        <addColumn schemaName= "public"
+                   tableName="posts">
+            <column name="coverImage"
+                    type="varchar(255)"/>
+        </addColumn>
+    </changeSet>
+    <changeSet  author="vebs"  id="7">
+        <modifyDataType columnName="coverImage"
+                         newDataType="TEXT"
+                         schemaName="public"
+                         tableName="posts"/>
+    </changeSet>
+    <changeSet id="8" author="vebs">
+        <dropColumn columnName="coverImage"
+                    schemaName="public"
+                    tableName="posts"/>
+    </changeSet>
+    <changeSet  author="vebs"  id="9">
+        <renameColumn  columnDataType="BIGINT"
+                       newColumnName="read_minutes"
+                       oldColumnName="readMinutes"
+                       schemaName="public"
+                       tableName="posts"/>
+    </changeSet>
+    <changeSet  author="vebs"  id="10">
+        <renameColumn  columnDataType="BIGINT"
+                       newColumnName="viewed_by"
+                       oldColumnName="viewedBy"
+                       schemaName="public"
+                       tableName="posts"/>
+    </changeSet>
+    <changeSet author="Vebs" id="11">
+        <addColumn schemaName= "public"
+                   tableName="posts">
+            <column name="cover_image"
+                    type="TEXT"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

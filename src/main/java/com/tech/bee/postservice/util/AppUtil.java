@@ -2,6 +2,8 @@ package com.tech.bee.postservice.util;
 
 import com.tech.bee.postservice.common.ErrorDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
+import com.tech.bee.postservice.dto.PostDTO;
+import com.tech.bee.postservice.entity.PostEntity;
 import com.tech.bee.postservice.enums.Enums;
 import com.tech.bee.postservice.exception.BaseCustomException;
 import lombok.experimental.UtilityClass;
@@ -13,6 +15,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -70,5 +73,10 @@ public class AppUtil {
                 log.error("Error occurred while merging beans {}", ExceptionUtils.getMessage(exception));
             }
         });
+    }
+
+    public static String publishedOn(PostEntity postEntity){
+        DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("d' 'MMM' 'yyyy");
+        return postEntity.getCreatedWhen().format(outputFormatter);
     }
 }

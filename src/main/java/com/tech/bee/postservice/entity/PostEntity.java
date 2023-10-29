@@ -29,6 +29,9 @@ public class PostEntity {
     @Type(type = "text")
     @Column(columnDefinition = "text")
     private String content;
+    @Type(type = "text")
+    @Column(columnDefinition = "text")
+    private String description;
     private String authorId;
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
@@ -40,6 +43,13 @@ public class PostEntity {
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")
     private List<LinkEntity> links = new ArrayList<>();
+    private Long likes;
+    @Column(name = "viewed_by")
+    private Long viewedBy;
+    @Column(name="read_minutes")
+    private Long readMinutes;
+    @Column(name = "cover_image")
+    private String coverImage;
     private String createdBy;
     @CreationTimestamp
     private LocalDateTime createdWhen;

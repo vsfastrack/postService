@@ -6,6 +6,7 @@ import com.tech.bee.postservice.common.PageResponseDTO;
 import com.tech.bee.postservice.dto.PostSearchDTO;
 import com.tech.bee.postservice.dto.PostDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
+import com.tech.bee.postservice.dto.PostSummaryDTO;
 import com.tech.bee.postservice.entity.PostEntity;
 import com.tech.bee.postservice.enums.Enums;
 import com.tech.bee.postservice.service.PostService;
@@ -14,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -66,6 +69,33 @@ public class PostResource {
     @Secured(ApiConstants.RoleConstants.ROLE_AUTHOR)
     public ResponseEntity<ApiResponseDTO> delete(@PathVariable("postIdentifier") final String postIdentifier){
         postService.delete(postIdentifier);
+        return new ResponseEntity<>(ApiResponseDTO.builder().build(), HttpStatus.NO_CONTENT);
+    }
+
+    @TransactionId
+    @GetMapping("/summaries")
+    public ResponseEntity<ApiResponseDTO> getPostSummaries(@RequestParam(name = "count" , required = false ,
+                                                                        defaultValue = "3") Integer count){
+        List<PostSummaryDTO> postSummaries = postService.findSummariesForTopRatedPosts(count);
+        return new ResponseEntity<>(ApiResponseDTO.builder().content(postSummaries).build(), HttpStatus.OK);
+    }
+
+    @TransactionId
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponseDTO> findPostSummariesList(@RequestParam(name = "pageIndex" , defaultValue = "0") final int pageIndex ,
+                                                       @RequestParam(name = "pageSize", defaultValue = "10") final int pageSize ,
+                                                       @RequestParam(name ="sortDir" , defaultValue = "DESC") final Enums.SortDirection sortDir ,
+                                                       @RequestParam(name="sortKey" , defaultValue = "createdWhen") final String sortKey
+    ){
+        return new ResponseEntity<>(ApiResponseDTO.builder().content(
+                postService.findPostSummariesList(pageIndex , pageSize ,sortDir ,sortKey)).build()
+                , HttpStatus.OK);
+    }
+    @TransactionId
+    @PatchMapping("/{postIdentifier}")
+    public ResponseEntity<ApiResponseDTO> like(@PathVariable("postIdentifier") final String postIdentifier ,
+                                                 @RequestBody PostDTO postDTO){
+        postService.update(postDTO,postIdentifier);
         return new ResponseEntity<>(ApiResponseDTO.builder().build(), HttpStatus.NO_CONTENT);
     }
 }

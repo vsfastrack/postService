@@ -56,7 +56,7 @@ public class PostValidator {
                     .message(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_CANNOT_BE_EMPTY)
                     .key(ApiConstants.KeyConstants.KEY_TITLE)
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
-        validateTitleLength(postDTO ,notificationErrors);
+        //validateTitleLength(postDTO ,notificationErrors);
     }
 
     private void validateTitleLength(PostDTO postDTO , List<ErrorDTO> notificationErrors){
@@ -84,7 +84,7 @@ public class PostValidator {
                     .message(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_CANNOT_BE_EMPTY)
                     .key(ApiConstants.KeyConstants.KEY_SUB_TITLE)
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
-        validateSubTitleLength(postDTO , notificationErrors);
+        //validateSubTitleLength(postDTO , notificationErrors);
     }
 
     private void validateContentLength(PostDTO postDTO , List<ErrorDTO> notificationErrors){
@@ -103,7 +103,7 @@ public class PostValidator {
                     .message(ApiConstants.ErrorMsgConstants.MESSAGE_FIELD_CANNOT_BE_EMPTY)
                     .key(ApiConstants.KeyConstants.KEY_CONTENT)
                     .category(Enums.ErrorCategory.VALIDATION_ERROR).build());
-        validateContentLength(postDTO , notificationErrors);
+        //validateContentLength(postDTO , notificationErrors);
     }
 
     private void validateSeriesLength(PostDTO postDTO , List<ErrorDTO> notificationErrors){
@@ -127,7 +127,7 @@ public class PostValidator {
     private void validateSeries(PostDTO postDTO, List<ErrorDTO> notificationErrors){
         if(StringUtils.isEmpty(postDTO.getSeries()))
             notificationErrors.add(AppUtil.buildValidationErrorError(ApiConstants.KeyConstants.KEY_SERIES));
-        validateSeriesLength(postDTO , notificationErrors);
+        //validateSeriesLength(postDTO , notificationErrors);
     }
 
     private void validateTags(PostDTO postDTO, List<ErrorDTO> notificationErrors){

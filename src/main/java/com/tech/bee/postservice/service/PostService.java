@@ -5,6 +5,7 @@ import com.tech.bee.postservice.common.PageResponseDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.dto.PostDTO;
 import com.tech.bee.postservice.dto.PostSearchDTO;
+import com.tech.bee.postservice.dto.PostSummaryDTO;
 import com.tech.bee.postservice.dto.TagDTO;
 import com.tech.bee.postservice.entity.LinkEntity;
 import com.tech.bee.postservice.entity.PostEntity;
@@ -67,7 +68,7 @@ public class PostService {
         postEntity.setIdentifier(UUID.randomUUID().toString());
         postEntity.setCreatedBy(securityService.getCurrentLoggedInUser());
         postRepository.save(postEntity);
-        return postEntity.getIdentifier();
+        return postEntity.getPostId();
     }
 
     public PageResponseDTO findPosts(PostSearchDTO postSearchDTO , final int pageIndex ,
@@ -89,7 +90,7 @@ public class PostService {
     }
 
     public PostDTO getPostDetails(final String postIdentifier){
-        PostEntity post = postRepository.findByIdentifier(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
+        PostEntity post = postRepository.findByPostId(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
                 errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
                 .build());
         List<TagDTO> tags = post.getTags().stream().map(tagMapper::toDto).collect(Collectors.toList());
@@ -156,6 +157,40 @@ public class PostService {
         return (CollectionUtils.isNotEmpty(postDTO.getLinks())) ?
                 postDTO.getLinks().stream().map(linkMapper::toEntity).collect(Collectors.toSet()) :
                 null;
+    }
+
+    public List<PostSummaryDTO> findSummariesForTopRatedPosts(Integer count){
+        List<PostEntity> postEntities = postRepository.findTopRatedPosts(count);
+        return postEntities.stream().map(this::convertToPostSummary).collect(Collectors.toList());
+    }
+
+    private PostSummaryDTO convertToPostSummary(PostEntity postEntity){
+        List<String> tagNames = postEntity.getTags().stream().map(TagEntity::getName).collect(Collectors.toList());
+        return postMapper.toPostSummary(postEntity , tagNames);
+    }
+
+    public PageResponseDTO findPostSummariesList(final int pageIndex ,
+                                     final int pageSize , final Enums.SortDirection sortDir ,
+                                     final String sortKey){
+        if(Enums.SortDirection.DESC == sortDir){
+            Sort sort = Sort.by(sortKey).descending();
+            Pageable pageable = PageRequest.of(pageIndex, pageSize ,sort);
+            Page<PostEntity> postPage = customRepository.findPosts(pageable);
+            List<PostSummaryDTO> postSummaryDTOList = postPage.get().map(postEntity -> {
+                return postMapper.toPostSummary(postEntity ,
+                        postEntity.getTags().stream().map(TagEntity::getName).collect(Collectors.toList()));
+            }).collect(Collectors.toList());
+            return PageResponseDTO.builder().totalResults(postPage.getTotalElements()).
+                    results(postSummaryDTOList).build();
+        }else{
+            Sort sort = Sort.by(sortKey).ascending();
+            Pageable pageable = PageRequest.of(pageIndex, pageSize ,sort);
+            Page<PostEntity> postPage = customRepository.findPosts(pageable);
+            List<PostSummaryDTO> postSummaryDTOList = postPage.get().map(postEntity -> postMapper.toPostSummary(postEntity ,
+                    postEntity.getTags().stream().map(TagEntity::getName).collect(Collectors.toList()))).collect(Collectors.toList());
+            return PageResponseDTO.builder().totalResults(postPage.getTotalElements()).
+                    results(postSummaryDTOList).build();
+        }
     }
 
 }

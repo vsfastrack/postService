@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 @NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PostDTO {
     private String title;
     private String subtitle;
@@ -22,4 +23,9 @@ public class PostDTO {
     private String identifier;
     private String link;
     private List<String> links;
+    private Long minToRead;
+    private Long viewedBy;
+    private String likesCount;
+    private String coverImage;
+    private String publishedOn;
 }
