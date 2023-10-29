@@ -3,20 +3,20 @@ package com.tech.bee.postservice.service;
 import com.tech.bee.postservice.common.ErrorDTO;
 import com.tech.bee.postservice.common.PageResponseDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
-import com.tech.bee.postservice.dto.PostDTO;
-import com.tech.bee.postservice.dto.PostSearchDTO;
-import com.tech.bee.postservice.dto.PostSummaryDTO;
-import com.tech.bee.postservice.dto.TagDTO;
+import com.tech.bee.postservice.dto.*;
 import com.tech.bee.postservice.entity.LinkEntity;
 import com.tech.bee.postservice.entity.PostEntity;
+import com.tech.bee.postservice.entity.ReactionEntity;
 import com.tech.bee.postservice.entity.TagEntity;
 import com.tech.bee.postservice.enums.Enums;
 import com.tech.bee.postservice.exception.BaseCustomException;
 import com.tech.bee.postservice.mapper.LinkMapper;
 import com.tech.bee.postservice.mapper.PostMapper;
+import com.tech.bee.postservice.mapper.ReactionMapper;
 import com.tech.bee.postservice.mapper.TagMapper;
 import com.tech.bee.postservice.repository.CustomRepository;
 import com.tech.bee.postservice.repository.PostRepository;
+import com.tech.bee.postservice.repository.ReactionRepository;
 import com.tech.bee.postservice.repository.TagRepository;
 import com.tech.bee.postservice.util.AppUtil;
 import com.tech.bee.postservice.validator.PostValidator;
@@ -46,6 +46,8 @@ public class PostService {
     private final CustomRepository customRepository;
     private final PostRepository postRepository;
     private final SecurityService securityService;
+    private final ReactionMapper reactionMapper;
+    private final ReactionRepository reactionRepository;
 
     @Transactional
     public String createPost(PostDTO postDTO){
@@ -95,7 +97,11 @@ public class PostService {
                 .build());
         List<TagDTO> tags = post.getTags().stream().map(tagMapper::toDto).collect(Collectors.toList());
         List<String> links = post.getLinks().stream().map(LinkEntity::getContent).collect(Collectors.toList());
-        return postMapper.toDto(post , tags , links);
+        PostDTO postDTO = postMapper.toDto(post , tags , links);
+        reactionRepository.findByPostId(postIdentifier).ifPresent(reactionEntity ->
+        postDTO.setLiked((reactionEntity.getReaction() == Enums.ReactionEnum.LIKE &&
+                reactionEntity.getUserId().equals(securityService.getCurrentLoggedInUser()))));
+        return postDTO;
     }
 
     @Transactional
@@ -191,6 +197,53 @@ public class PostService {
             return PageResponseDTO.builder().totalResults(postPage.getTotalElements()).
                     results(postSummaryDTOList).build();
         }
+    }
+
+    public String react(String postIdentifier , Enums.ReactionEnum reaction){
+        PostEntity existingPost =  postRepository.findByPostId(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
+                errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
+                .build());
+        Optional<ReactionEntity> reactionEntity =  reactionRepository.findByPostId(postIdentifier);
+        if(Enums.ReactionEnum.DISLIKE == reaction){
+            if(!reactionEntity.isPresent())
+                throw BaseCustomException.builder().errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_REACTION)))
+                        .httpStatus(HttpStatus.NOT_FOUND)
+                        .build();
+            ReactionEntity existingReaction = reactionEntity.get();
+            existingReaction.setReaction(Enums.ReactionEnum.DISLIKE);
+            dislikePost(existingPost , existingReaction);
+            return existingReaction.getReactionId();
+        }else if(Enums.ReactionEnum.LIKE == reaction){
+            if(reactionEntity.isPresent()){
+                ReactionEntity existingReaction = reactionEntity.get();
+                if(Enums.ReactionEnum.DISLIKE == existingReaction.getReaction())
+                    existingReaction.setReaction(Enums.ReactionEnum.LIKE);
+                likePost(existingPost , existingReaction);
+                return existingReaction.getReactionId();
+            }else{
+                ReactionEntity newReaction = reactionMapper.toEntity(reaction , postIdentifier ,
+                        securityService.getCurrentLoggedInUser());
+                likePost(existingPost , newReaction);
+                return newReaction.getReactionId();
+            }
+        }
+        throw BaseCustomException.builder().errors(Collections.singletonList(AppUtil.buildValidationErrorError(ApiConstants.KeyConstants.KEY_REACTION)))
+                .httpStatus(HttpStatus.BAD_REQUEST)
+                .build();
+    }
+    @Transactional
+    private void dislikePost(PostEntity postEntity , ReactionEntity reactionEntity){
+        Long likesCount = postEntity.getLikes();
+        postEntity.setLikes(likesCount - 1);
+        reactionRepository.save(reactionEntity);
+        postRepository.save(postEntity);
+    }
+    @Transactional
+    private void likePost(PostEntity postEntity , ReactionEntity reactionEntity){
+        Long likesCount = postEntity.getLikes() != null ? postEntity.getLikes() : 0;
+        postEntity.setLikes(likesCount + 1);
+        reactionRepository.save(reactionEntity);
+        postRepository.save(postEntity);
     }
 
 }

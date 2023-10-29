@@ -28,4 +28,5 @@ public class PostDTO {
     private String likesCount;
     private String coverImage;
     private String publishedOn;
+    private boolean isLiked;
 }

@@ -2,15 +2,15 @@ package com.tech.bee.postservice.resources;
 
 import com.tech.bee.postservice.annotation.TransactionId;
 import com.tech.bee.postservice.common.ApiResponseDTO;
-import com.tech.bee.postservice.common.PageResponseDTO;
 import com.tech.bee.postservice.dto.PostSearchDTO;
 import com.tech.bee.postservice.dto.PostDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.dto.PostSummaryDTO;
-import com.tech.bee.postservice.entity.PostEntity;
+import com.tech.bee.postservice.dto.ReactionDTO;
 import com.tech.bee.postservice.enums.Enums;
 import com.tech.bee.postservice.service.PostService;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
@@ -92,10 +92,10 @@ public class PostResource {
                 , HttpStatus.OK);
     }
     @TransactionId
-    @PatchMapping("/{postIdentifier}")
+    @PatchMapping("/{postIdentifier}/react")
     public ResponseEntity<ApiResponseDTO> like(@PathVariable("postIdentifier") final String postIdentifier ,
-                                                 @RequestBody PostDTO postDTO){
-        postService.update(postDTO,postIdentifier);
-        return new ResponseEntity<>(ApiResponseDTO.builder().build(), HttpStatus.NO_CONTENT);
+                                                 @RequestParam(name = "reaction") final Enums.ReactionEnum reaction){
+        String reactionIdentifier = postService.react(postIdentifier , reaction);
+        return new ResponseEntity<>(ApiResponseDTO.builder().content(reactionIdentifier).build(), HttpStatus.OK);
     }
 }

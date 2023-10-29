@@ -27,6 +27,7 @@ public class ApiConstants {
         public static final String KEY_TAG="tag";
         public static final String KEY_TAG_NAME="tag.name";
         public static final String KEY_POST="post";
+        public static final String KEY_REACTION="reaction";
         public static final String KEY_SERIES="series";
         public static final String KEY_USER="user";
     }

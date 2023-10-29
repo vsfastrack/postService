@@ -15,4 +15,8 @@ public class Enums {
     public enum SortDirection{
         ASC,DESC
     }
+    @Getter
+    public enum ReactionEnum{
+        LIKE,DISLIKE
+    }
 }
