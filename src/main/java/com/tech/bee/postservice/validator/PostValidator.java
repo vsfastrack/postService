@@ -38,11 +38,11 @@ public class PostValidator {
 
     public List<ErrorDTO> validatePatchRequest(PostDTO postDTO){
         List<ErrorDTO> notificationErrors = new ArrayList<>();
-        validateTitleLength(postDTO, notificationErrors);
-        validateSubTitleLength(postDTO, notificationErrors);
-        validateContentLength(postDTO, notificationErrors);
-        validateTags(postDTO, notificationErrors);
-        validateSeriesLength(postDTO , notificationErrors);
+//        validateTitleLength(postDTO, notificationErrors);
+//        validateSubTitleLength(postDTO, notificationErrors);
+//        validateContentLength(postDTO, notificationErrors);
+//        validateTags(postDTO, notificationErrors);
+//        validateSeriesLength(postDTO , notificationErrors);
         return notificationErrors;
     }
 

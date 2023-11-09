@@ -98,15 +98,16 @@ public class PostService {
         List<TagDTO> tags = post.getTags().stream().map(tagMapper::toDto).collect(Collectors.toList());
         List<String> links = post.getLinks().stream().map(LinkEntity::getContent).collect(Collectors.toList());
         PostDTO postDTO = postMapper.toDto(post , tags , links);
-        reactionRepository.findByPostId(postIdentifier).ifPresent(reactionEntity ->
-        postDTO.setLiked((reactionEntity.getReaction() == Enums.ReactionEnum.LIKE &&
-                reactionEntity.getUserId().equals(securityService.getCurrentLoggedInUser()))));
+        ReactionEntity reactionByExistingUser = reactionRepository.findByPostIdAndUserId(postIdentifier , securityService.getCurrentLoggedInUser());
+        postDTO.setLiked(Objects.nonNull(reactionByExistingUser) &&
+                reactionByExistingUser.getReaction() ==  Enums.ReactionEnum.LIKE);
+        postDTO.setAuthor(post.getCreatedBy().equals(securityService.getCurrentLoggedInUser()));
         return postDTO;
     }
 
     @Transactional
     public void update(PostDTO postDTO , final String postIdentifier){
-        PostEntity existingPost =  postRepository.findByIdentifier(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
+        PostEntity existingPost =  postRepository.findByPostId(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
                 errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
                 .build());
         List<ErrorDTO> validationErrors = postValidator.validatePatchRequest(postDTO);
@@ -119,7 +120,7 @@ public class PostService {
     }
 
     public void delete(final String postIdentifier){
-        PostEntity existingPost =  postRepository.findByIdentifier(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
+        PostEntity existingPost =  postRepository.findByPostId(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
                 errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
                 .build());
         List<ErrorDTO> ownershipErrors = securityService.validateOwnership(existingPost.getCreatedBy());
@@ -132,7 +133,15 @@ public class PostService {
 
     private void updatePost(PostEntity existingPost , PostDTO patchDTO){
         AppUtil.mergeObjectsWithProperties(patchDTO , existingPost ,
-                Arrays.asList("title" , "subtitle" ,"category","series","content"));
+                Arrays.asList("title" , "subtitle" ,"category","series",
+                        "content" , "description","series","content",
+                        "coverImage"));
+        if(Objects.nonNull(patchDTO.getTags())){
+            Set<TagEntity> tags = fetchTags(patchDTO);
+            if(CollectionUtils.isNotEmpty(tags)){
+                existingPost.setTags(tags);
+            }
+        }
     }
 
     private Set<TagEntity> fetchTags(PostDTO postDTO){
@@ -203,23 +212,22 @@ public class PostService {
         PostEntity existingPost =  postRepository.findByPostId(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
                 errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
                 .build());
-        Optional<ReactionEntity> reactionEntity =  reactionRepository.findByPostId(postIdentifier);
+        ReactionEntity existingReactionByUser = reactionRepository.findByPostIdAndUserId(postIdentifier ,
+                                                securityService.getCurrentLoggedInUser());
         if(Enums.ReactionEnum.DISLIKE == reaction){
-            if(!reactionEntity.isPresent())
+            if(Objects.isNull(existingReactionByUser))
                 throw BaseCustomException.builder().errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_REACTION)))
                         .httpStatus(HttpStatus.NOT_FOUND)
                         .build();
-            ReactionEntity existingReaction = reactionEntity.get();
-            existingReaction.setReaction(Enums.ReactionEnum.DISLIKE);
-            dislikePost(existingPost , existingReaction);
-            return existingReaction.getReactionId();
+            existingReactionByUser.setReaction(Enums.ReactionEnum.DISLIKE);
+            dislikePost(existingPost , existingReactionByUser);
+            return existingReactionByUser.getReactionId();
         }else if(Enums.ReactionEnum.LIKE == reaction){
-            if(reactionEntity.isPresent()){
-                ReactionEntity existingReaction = reactionEntity.get();
-                if(Enums.ReactionEnum.DISLIKE == existingReaction.getReaction())
-                    existingReaction.setReaction(Enums.ReactionEnum.LIKE);
-                likePost(existingPost , existingReaction);
-                return existingReaction.getReactionId();
+            if(Objects.nonNull(existingReactionByUser)){
+                if(Enums.ReactionEnum.DISLIKE == existingReactionByUser.getReaction())
+                    existingReactionByUser.setReaction(Enums.ReactionEnum.LIKE);
+                likePost(existingPost , existingReactionByUser);
+                return existingReactionByUser.getReactionId();
             }else{
                 ReactionEntity newReaction = reactionMapper.toEntity(reaction , postIdentifier ,
                         securityService.getCurrentLoggedInUser());

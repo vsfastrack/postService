@@ -1,7 +1,6 @@
 package com.tech.bee.postservice.mapper;
 
 
-import com.tech.bee.postservice.dto.ReactionDTO;
 import com.tech.bee.postservice.entity.ReactionEntity;
 import com.tech.bee.postservice.enums.Enums;
 import org.mapstruct.Mapper;

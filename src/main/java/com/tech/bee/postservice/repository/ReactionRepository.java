@@ -9,4 +9,5 @@ import java.util.Optional;
 @Repository
 public interface ReactionRepository extends JpaRepository<ReactionEntity , Long> {
     Optional<ReactionEntity> findByPostId(String postId);
+    ReactionEntity findByPostIdAndUserId(String postId , String userId);
 }
