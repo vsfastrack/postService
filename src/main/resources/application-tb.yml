@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    username: ${SPRING_DATASOURCE_USERNAME}
+    url: ${SPRING_DATASOURCE_URL}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driverClassName: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    changeLog: classpath:/db/changelog/db.changelog-master.xml
+keycloak:
+  enabled: true
+  auth-server-url: http://localhost:8080
+  credentials:
+    secret: h3Zj7fcuZI4EWqyeVb6rX34HnnU6eEvt
+  ssl-required: external
+  realm: techbee
+  resource: post_service_client
+  bearer-only: true
+  use-resource-role-mappings: false

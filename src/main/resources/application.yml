@@ -27,8 +27,18 @@ logbook:
   format:
     style: http
 management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  metrics:
+    export:
+      prometheus:
+        enabled: 'true'
   endpoint:
-    health:
-      show-details: always
+    metrics:
+      web:
+        exposure:
+          include: '*'
   liquibase:
     changeLog: classpath:/db/changelog/db.changelog-master.xml

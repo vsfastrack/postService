@@ -1,5 +1,6 @@
 package com.tech.bee.postservice.resources;
 
+import com.tech.bee.postservice.annotation.RequestMetrics;
 import com.tech.bee.postservice.annotation.TransactionId;
 import com.tech.bee.postservice.common.ApiResponseDTO;
 import com.tech.bee.postservice.dto.PostSearchDTO;
@@ -8,6 +9,7 @@ import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.dto.PostSummaryDTO;
 import com.tech.bee.postservice.dto.ReactionDTO;
 import com.tech.bee.postservice.enums.Enums;
+import com.tech.bee.postservice.metrics.RequestMetricCounter;
 import com.tech.bee.postservice.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +28,7 @@ public class PostResource {
     private final PostService postService;
 
     @TransactionId
+    @RequestMetrics
     @PostMapping
     @Secured(ApiConstants.RoleConstants.ROLE_AUTHOR)
     public ResponseEntity<ApiResponseDTO> create(@RequestBody PostDTO postDTO){
@@ -34,6 +37,7 @@ public class PostResource {
     }
 
     @TransactionId
+    @RequestMetrics
     @GetMapping("/search")
     @Secured(ApiConstants.RoleConstants.ROLE_USER)
     public ResponseEntity<ApiResponseDTO> find(@RequestBody PostSearchDTO postSearchDTO ,
@@ -48,14 +52,15 @@ public class PostResource {
     }
 
     @TransactionId
-    @GetMapping("/{postIdentifier}")
-    @Secured(ApiConstants.RoleConstants.ROLE_USER)
+    @RequestMetrics
+    @GetMapping("/{postIdentifier}/details")
     public ResponseEntity<ApiResponseDTO> findPostDetails(@PathVariable("postIdentifier") final String postIdentifier){
         PostDTO postDTO = postService.getPostDetails(postIdentifier);
         return new ResponseEntity<>(ApiResponseDTO.builder().content(postDTO).build(), HttpStatus.OK);
     }
 
     @TransactionId
+    @RequestMetrics
     @PatchMapping("/{postIdentifier}")
     @Secured(ApiConstants.RoleConstants.ROLE_AUTHOR)
     public ResponseEntity<ApiResponseDTO> update(@PathVariable("postIdentifier") final String postIdentifier ,
@@ -65,6 +70,7 @@ public class PostResource {
     }
 
     @TransactionId
+    @RequestMetrics
     @DeleteMapping("/{postIdentifier}")
     @Secured(ApiConstants.RoleConstants.ROLE_AUTHOR)
     public ResponseEntity<ApiResponseDTO> delete(@PathVariable("postIdentifier") final String postIdentifier){
@@ -73,6 +79,7 @@ public class PostResource {
     }
 
     @TransactionId
+    @RequestMetrics
     @GetMapping("/summaries")
     public ResponseEntity<ApiResponseDTO> getPostSummaries(@RequestParam(name = "count" , required = false ,
                                                                         defaultValue = "3") Integer count){
@@ -81,6 +88,7 @@ public class PostResource {
     }
 
     @TransactionId
+    @RequestMetrics
     @GetMapping("/list")
     public ResponseEntity<ApiResponseDTO> findPostSummariesList(@RequestParam(name = "pageIndex" , defaultValue = "0") final int pageIndex ,
                                                        @RequestParam(name = "pageSize", defaultValue = "10") final int pageSize ,
@@ -91,7 +99,9 @@ public class PostResource {
                 postService.findPostSummariesList(pageIndex , pageSize ,sortDir ,sortKey)).build()
                 , HttpStatus.OK);
     }
+
     @TransactionId
+    @RequestMetrics
     @PatchMapping("/{postIdentifier}/react")
     public ResponseEntity<ApiResponseDTO> like(@PathVariable("postIdentifier") final String postIdentifier ,
                                                  @RequestParam(name = "reaction") final Enums.ReactionEnum reaction){

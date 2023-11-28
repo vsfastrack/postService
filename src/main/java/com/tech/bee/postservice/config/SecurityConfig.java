@@ -66,8 +66,10 @@ public class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/actuator/health").permitAll().
+                and().authorizeRequests().antMatchers("/actuator/prometheus").permitAll().
                 and().authorizeRequests().antMatchers("/api/v1/posts/summaries").permitAll().
-                and().authorizeRequests().antMatchers("/api/v1/posts/list").permitAll()
+                and().authorizeRequests().antMatchers("/api/v1/posts/list").permitAll().
+                and().authorizeRequests().antMatchers("/api/v1/posts/*/details").permitAll()
                 .anyRequest().authenticated();
     }
 
