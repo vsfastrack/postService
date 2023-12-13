@@ -1,5 +1,7 @@
 package com.tech.bee.postservice.util;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.tech.bee.postservice.common.ErrorDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.dto.PostDTO;
@@ -23,6 +25,12 @@ import java.util.Objects;
 @Slf4j
 @UtilityClass
 public class AppUtil {
+
+    private static final ObjectMapper objectMapper;
+    static {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+    }
 
     public String generateIdentifier(String prefix) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -75,6 +83,14 @@ public class AppUtil {
         });
     }
 
+    public static String getAsJsonString(Object object){
+        try{
+            return objectMapper.writeValueAsString(object);
+        }catch(Exception exception){
+            log.error("Exception occurred while parsing input {}",ExceptionUtils.getMessage(exception));
+        }
+        return null;
+    }
     public static String publishedOn(PostEntity postEntity){
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("d' 'MMM' 'yyyy");
         return postEntity.getCreatedWhen().format(outputFormatter);

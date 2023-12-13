@@ -3,6 +3,7 @@ package com.tech.bee.postservice.advice;
 import com.tech.bee.postservice.common.ApiResponseDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.metrics.RequestMetricCounter;
+import com.tech.bee.postservice.util.AppUtil;
 import com.tech.bee.postservice.util.WebUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -43,6 +44,9 @@ public class ResponseEnrichmentAdvice {
             ApiResponseDTO apiResponse = (ApiResponseDTO) response.getBody();
             apiResponse.setTimeStamp(getCurrentTimestamp());
             apiResponse.setTransactionId(getTransactionId());
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+            String requestMappingValue = (String) request.getAttribute("requestMapping");
+            log.info("endpoint = {}  requestMethod = {} requestParams = {}",requestMappingValue , WebUtils.getEndpointMethod() , AppUtil.getAsJsonString(apiResponse.getContent()));
         }
         requestMetricCounter.increment(WebUtils.getRequestEndpoint() ,
                 WebUtils.getRequestMethod() , response.getStatusCode().value());

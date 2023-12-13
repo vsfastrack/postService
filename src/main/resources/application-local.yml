@@ -1,21 +1,49 @@
 spring:
   datasource:
-    username: postgres
-    url: jdbc:postgresql://localhost:5432/postDb
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postDb}
     driverClassName: org.postgresql.Driver
-    password: admin12345
+    password: ${SPRING_DATASOURCE_PASSWORD:admin12345}
   jpa:
     hibernate:
       ddl-auto: none
   liquibase:
     changeLog: classpath:/db/changelog/db.changelog-master.xml
+  data:
+    elasticsearch:
+      cluster-nodes: localhost:9200
+  sleuth:
+    sampler:
+      probability: 1.0
+logging:
+  level:
+    org:
+      keycloak: DEBUG
+#logging:
+#  file:
+#    name: /Users/macvebs/workspace/logging/post-service/logs/app.log
+#  level:
+#    root: info
+#    liquibase: info
+#    org.springframework.*: error
+#logbook:
+#  format:
+#    style: http
+#  filter:
+#    default:
+#      type: replace
+#      value: "REDACTED"
+#    multipart:
+#      type: obfuscate
+graylog:
+  host: http://localhost:12201/gelf
 keycloak:
   enabled: true
-  auth-server-url: http://localhost:8080
+  auth-server-url: ${KEYCLOAK_URL:http://localhost:8080}
   credentials:
-    secret: h3Zj7fcuZI4EWqyeVb6rX34HnnU6eEvt
+    secret: ${KEYCLOAK_CLIENT_SECRET:qcVavgKeDhCQ526Lhlbr4fsZsP7C7xq5}
   ssl-required: external
-  realm: techbee
+  realm: ${KEYCLOAK_REALM:techbee}
   resource: post_service_client
   bearer-only: true
   use-resource-role-mappings: false

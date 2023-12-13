@@ -1,4 +1,5 @@
 <configuration>
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
 
     <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
@@ -6,11 +7,27 @@
         </encoder>
     </appender>
 
-    <logger name="org.springframework.web" level="DEBUG"/>
-    <logger name="org.zalando.problem.spring.web.advice" level="DEBUG"/>
+    <logger name="org.springframework.web" level="INFO"/>
+    <logger name="org.zalando.logbook" level="INFO" additivity="false">
+        <appender-ref ref="CONSOLE" />
+    </logger>
 
+    <appender name="GELF" class="biz.paluch.logging.gelf.logback.GelfLogbackAppender">
+        <host>localhost</host>
+        <port>12201</port>
+        <version>1.1</version>
+        <facility>post-service</facility>
+        <extractStackTrace>true</extractStackTrace>
+        <filterStackTrace>true</filterStackTrace>
+        <maximumMessageSize>8192</maximumMessageSize>
+        <timestampPattern>yyyy-MM-dd HH:mm:ss,SSS</timestampPattern>
+        <additionalFields>traceId=%X{traceId},level,loggerName</additionalFields>
+        <includeFullMdc>true</includeFullMdc>
+        <mdcProfiling>false</mdcProfiling>
+    </appender>
     <root level="INFO">
-        <appender-ref ref="console"/>
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+        <appender-ref ref="GELF"/>
     </root>
-
 </configuration>

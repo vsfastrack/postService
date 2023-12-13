@@ -11,7 +11,9 @@ import com.tech.bee.postservice.dto.ReactionDTO;
 import com.tech.bee.postservice.enums.Enums;
 import com.tech.bee.postservice.metrics.RequestMetricCounter;
 import com.tech.bee.postservice.service.PostService;
+import com.tech.bee.postservice.util.AppUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = ApiConstants.PathConstants.PATH_POST_RESOURCE)
+@Slf4j
 public class PostResource {
 
     private final PostService postService;
@@ -55,6 +58,7 @@ public class PostResource {
     @RequestMetrics
     @GetMapping("/{postIdentifier}/details")
     public ResponseEntity<ApiResponseDTO> findPostDetails(@PathVariable("postIdentifier") final String postIdentifier){
+        log.info("{} hit with postIdentifier {}" , "/{postIdentifier}/details" , postIdentifier);
         PostDTO postDTO = postService.getPostDetails(postIdentifier);
         return new ResponseEntity<>(ApiResponseDTO.builder().content(postDTO).build(), HttpStatus.OK);
     }
