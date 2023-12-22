@@ -32,7 +32,7 @@ public class PostValidator {
         validateContent(postDTO, notificationErrors);
         validateAuthor(postDTO, notificationErrors);
         validateTags(postDTO, notificationErrors);
-        validateSeries(postDTO , notificationErrors);
+//        validateSeries(postDTO , notificationErrors);
         return notificationErrors;
     }
 
