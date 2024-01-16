@@ -1,4 +1,4 @@
-package com.tech.bee.postservice.util;
+package com.tech.bee.postservice.util.web;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -10,7 +10,6 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.lang.reflect.Method;
 import java.util.Objects;

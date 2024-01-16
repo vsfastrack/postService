@@ -1,19 +1,19 @@
 package com.tech.bee.postservice.service;
 
+import com.tech.bee.postservice.client.personalisation.PersonalisationClient;
 import com.tech.bee.postservice.common.ErrorDTO;
 import com.tech.bee.postservice.common.PageResponseDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.dto.*;
+import com.tech.bee.postservice.dto.web.InterestDTO;
 import com.tech.bee.postservice.entity.LinkEntity;
 import com.tech.bee.postservice.entity.PostEntity;
 import com.tech.bee.postservice.entity.ReactionEntity;
 import com.tech.bee.postservice.entity.TagEntity;
 import com.tech.bee.postservice.enums.Enums;
 import com.tech.bee.postservice.exception.BaseCustomException;
-import com.tech.bee.postservice.mapper.LinkMapper;
-import com.tech.bee.postservice.mapper.PostMapper;
-import com.tech.bee.postservice.mapper.ReactionMapper;
-import com.tech.bee.postservice.mapper.TagMapper;
+import com.tech.bee.postservice.mapper.*;
+import com.tech.bee.postservice.model.PreferenceModel;
 import com.tech.bee.postservice.repository.CustomRepository;
 import com.tech.bee.postservice.repository.PostRepository;
 import com.tech.bee.postservice.repository.ReactionRepository;
@@ -22,6 +22,8 @@ import com.tech.bee.postservice.util.AppUtil;
 import com.tech.bee.postservice.validator.PostValidator;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
+import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,6 +50,8 @@ public class PostService {
     private final SecurityService securityService;
     private final ReactionMapper reactionMapper;
     private final ReactionRepository reactionRepository;
+    private final PersonalisationClient personalisationClient;
+    private final PreferenceMapper preferenceMapper;
 
     @Transactional
     public String createPost(PostDTO postDTO){
@@ -239,6 +243,22 @@ public class PostService {
                 .httpStatus(HttpStatus.BAD_REQUEST)
                 .build();
     }
+
+    @Transactional
+    public void increaseViewCounter(String postIdentifier){
+        PostEntity existingPost =  postRepository.findByPostId(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
+                errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
+                .build());
+        Long viewedBy = existingPost.getViewedBy();
+        existingPost.setViewedBy(viewedBy+1);
+    }
+
+    public List<PreferenceDTO> getPreferences(){
+        String currentUserId = securityService.getCurrentLoggedInUser();
+        final List<String> interests = personalisationClient.fetchInterests(currentUserId);
+        return interests.stream().map(this::findPostsByPreference).collect(Collectors.toList());
+    }
+
     @Transactional
     private void dislikePost(PostEntity postEntity , ReactionEntity reactionEntity){
         Long likesCount = postEntity.getLikes();
@@ -252,6 +272,25 @@ public class PostService {
         postEntity.setLikes(likesCount + 1);
         reactionRepository.save(reactionEntity);
         postRepository.save(postEntity);
+    }
+
+    private PreferenceDTO findPostsByPreference(final String tagIdentifier){
+        List<PreferenceModel> preferenceModels = postRepository.findPostsByTags(tagIdentifier);
+        if(!CollectionUtils.isEmpty(preferenceModels)){
+            final String preferenceName = preferenceModels.get(0).getName();
+            List<PostSummaryDTO> summaries = preferenceModels.stream().map(model -> extractToPostSummary(model.getPost()))
+                                                .collect(Collectors.toList());
+            return preferenceMapper.toDTO(preferenceName,summaries);
+        }
+        return null;
+    }
+    private List<PostSummaryDTO> extractSummaries(final List<PreferenceModel> models){
+        return models.stream().map(model-> extractToPostSummary(model.getPost())).collect(Collectors.toList());
+    }
+
+    private PostSummaryDTO extractToPostSummary(final PostEntity postEntity){
+        List<String> tags = postEntity.getTags().stream().map(TagEntity::getName).collect(Collectors.toList());
+        return postMapper.toPostSummary(postEntity,tags);
     }
 
 }

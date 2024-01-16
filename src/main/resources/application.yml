@@ -42,3 +42,11 @@ management:
           include: '*'
   liquibase:
     changeLog: classpath:/db/changelog/db.changelog-master.xml
+
+# Personalisation client properties
+personalisation:
+  client:
+    baseUrl: http://localhost:8086/personalisationService/
+    fetchPreferencesPath: /api/v1/interests/
+    connectTimeout: 10000
+    readTimeOut: 60000

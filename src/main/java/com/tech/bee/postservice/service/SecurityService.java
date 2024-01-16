@@ -5,6 +5,7 @@ import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.enums.Enums;
 import org.keycloak.KeycloakPrincipal;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -34,5 +35,16 @@ public class SecurityService {
                     .key(ApiConstants.KeyConstants.KEY_USER)
                     .category(Enums.ErrorCategory.BUSINESS_VALIDATION_ERROR).build());
         return validationErrors;
+    }
+
+    public String getTokenForCurrentUser(){
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication authentication = securityContext.getAuthentication();
+        if (authentication != null && authentication.getCredentials() != null) {
+            // Assuming the authentication.getCredentials() is the authentication token
+            Object credentials = authentication.getCredentials();
+            return credentials.toString();
+        }
+        return null;
     }
 }

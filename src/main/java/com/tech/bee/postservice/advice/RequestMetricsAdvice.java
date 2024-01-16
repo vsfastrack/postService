@@ -1,7 +1,7 @@
 package com.tech.bee.postservice.advice;
 
 import com.tech.bee.postservice.annotation.RequestMetrics;
-import com.tech.bee.postservice.util.WebUtils;
+import com.tech.bee.postservice.util.web.WebUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
