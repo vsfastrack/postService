@@ -5,7 +5,6 @@ import com.tech.bee.postservice.common.ErrorDTO;
 import com.tech.bee.postservice.common.PageResponseDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.dto.*;
-import com.tech.bee.postservice.dto.web.InterestDTO;
 import com.tech.bee.postservice.entity.LinkEntity;
 import com.tech.bee.postservice.entity.PostEntity;
 import com.tech.bee.postservice.entity.ReactionEntity;
@@ -22,8 +21,6 @@ import com.tech.bee.postservice.util.AppUtil;
 import com.tech.bee.postservice.validator.PostValidator;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.collections4.SetUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -276,21 +273,21 @@ public class PostService {
 
     private PreferenceDTO findPostsByPreference(final String tagIdentifier){
         List<PreferenceModel> preferenceModels = postRepository.findPostsByTags(tagIdentifier);
-        if(!CollectionUtils.isEmpty(preferenceModels)){
-            final String preferenceName = preferenceModels.get(0).getName();
-            List<PostSummaryDTO> summaries = preferenceModels.stream().map(model -> extractToPostSummary(model.getPost()))
-                                                .collect(Collectors.toList());
-            return preferenceMapper.toDTO(preferenceName,summaries);
-        }
+//        if(!CollectionUtils.isEmpty(preferenceModels)){
+//            final String preferenceName = preferenceModels.get(0).getName();
+//            List<PostSummaryDTO> summaries = preferenceModels.stream().map(model -> extractToPostSummary(model.getPost()))
+//                                                .collect(Collectors.toList());
+//            return preferenceMapper.toDTO(preferenceName,summaries);
+//        }
         return null;
     }
-    private List<PostSummaryDTO> extractSummaries(final List<PreferenceModel> models){
-        return models.stream().map(model-> extractToPostSummary(model.getPost())).collect(Collectors.toList());
-    }
-
-    private PostSummaryDTO extractToPostSummary(final PostEntity postEntity){
-        List<String> tags = postEntity.getTags().stream().map(TagEntity::getName).collect(Collectors.toList());
-        return postMapper.toPostSummary(postEntity,tags);
-    }
+//    private List<PostSummaryDTO> extractSummaries(final List<PreferenceModel> models){
+//        return models.stream().map(model-> extractToPostSummary(model.getPost())).collect(Collectors.toList());
+//    }
+//
+//    private PostSummaryDTO extractToPostSummary(final PostEntity postEntity){
+//        List<String> tags = postEntity.getTags().stream().map(TagEntity::getName).collect(Collectors.toList());
+//        return postMapper.toPostSummary(postEntity,tags);
+//    }
 
 }

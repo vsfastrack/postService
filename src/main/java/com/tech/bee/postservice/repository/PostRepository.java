@@ -24,6 +24,13 @@ public interface PostRepository extends PagingAndSortingRepository<PostEntity, L
     @Query(value = "SELECT * FROM posts WHERE likes IS NOT NULL ORDER BY likes DESC LIMIT ?1", nativeQuery = true)
     List<PostEntity> findTopRatedPosts(int limit);
 
-    @Query(value = "SELECT t.name as name ,p.* FROM posts p JOIN post_tags pt ON pt.post_id = p.id JOIN tags t ON t.id = pt.tag_id WHERE t.identifier = :tagIdentifier",nativeQuery = true)
+    @Query(value = "SELECT t.name as name ,p.title as title,p.post_id as postId,p.subtitle as subtitle,\n" +
+            "p.description as description,p.likes as likes,p.read_minutes as readMinutes,\n" +
+            "p.viewed_by as viewedBy\n" +
+            "FROM posts p \n" +
+            "JOIN post_tags pt ON pt.post_id = p.id \n" +
+            "JOIN tags t ON t.id = pt.tag_id \n" +
+            "WHERE t.identifier  = :tagIdentifier",
+            nativeQuery = true)
     List<PreferenceModel> findPostsByTags(@Param("tagIdentifier") final String tagIdentifier);
 }

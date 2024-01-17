@@ -3,7 +3,7 @@ package com.tech.bee.postservice.client.personalisation;
 import com.tech.bee.postservice.client.BaseWebClient;
 import com.tech.bee.postservice.configuration.personalisation.PersonalisationClientConfiguration;
 import com.tech.bee.postservice.constants.ApiConstants;
-import com.tech.bee.postservice.dto.web.InterestDTO;
+import com.tech.bee.postservice.dto.client.InterestDTO;
 import com.tech.bee.postservice.exception.BaseCustomException;
 import com.tech.bee.postservice.service.SecurityService;
 import com.tech.bee.postservice.util.AppUtil;
@@ -34,7 +34,7 @@ public class PersonalisationClient extends BaseWebClient {
         final String fetchPreferencesUri = configuration.getPersonalisationClientProperties().getFetchPreferencesPath() + userId;
         InterestDTO interestResponse = client.get().uri(new UriTemplate(fetchPreferencesUri).toString())
                 .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
-                .headers(httpHeaders -> httpHeaders.setBearerAuth(securityService.getTokenForCurrentUser()))
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(obtainAccessToken()))
                 .retrieve()
                 .toEntity(InterestDTO.class)
                 .blockOptional()

@@ -53,3 +53,10 @@ personalisation:
     fetchPreferencesPath: /api/v1/interests/
     connectTimeout: 10000
     readTimeOut: 60000
+
+admin:
+  cli:
+    clientId: identity_service_client
+    clientSecret: QeckRohx9DGw7ijQFxMVo9HBBYH2zKpU
+    grantType: client_credentials
+    tokenUrl: http://localhost:8080/realms/techbee/protocol/openid-connect/token
