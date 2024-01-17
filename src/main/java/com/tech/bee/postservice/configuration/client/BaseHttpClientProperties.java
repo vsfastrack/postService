@@ -1,9 +1,10 @@
 package com.tech.bee.postservice.configuration.client;
 
 import lombok.Data;
-import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-@Getter
+@Data
+@NoArgsConstructor
 public class BaseHttpClientProperties {
     private String baseUrl;
     private Long readTimeOut;

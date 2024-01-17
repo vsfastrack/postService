@@ -1,8 +1,10 @@
-package com.tech.bee.postservice.configuration.client;
+package com.tech.bee.postservice.client;
 
+import com.tech.bee.postservice.configuration.client.BaseHttpClientProperties;
 import io.netty.channel.ChannelOption;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.handler.timeout.WriteTimeoutHandler;
+import lombok.Getter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ClientHttpConnector;
@@ -12,6 +14,7 @@ import reactor.netty.http.client.HttpClient;
 
 import java.util.concurrent.TimeUnit;
 
+@Getter
 public class BaseWebClient {
     protected final WebClient client;
 
