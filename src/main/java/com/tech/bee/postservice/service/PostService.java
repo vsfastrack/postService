@@ -11,8 +11,10 @@ import com.tech.bee.postservice.entity.ReactionEntity;
 import com.tech.bee.postservice.entity.TagEntity;
 import com.tech.bee.postservice.enums.Enums;
 import com.tech.bee.postservice.exception.BaseCustomException;
-import com.tech.bee.postservice.mapper.*;
-import com.tech.bee.postservice.model.PreferenceModel;
+import com.tech.bee.postservice.mapper.LinkMapper;
+import com.tech.bee.postservice.mapper.PostMapper;
+import com.tech.bee.postservice.mapper.ReactionMapper;
+import com.tech.bee.postservice.mapper.TagMapper;
 import com.tech.bee.postservice.repository.CustomRepository;
 import com.tech.bee.postservice.repository.PostRepository;
 import com.tech.bee.postservice.repository.ReactionRepository;
@@ -48,7 +50,6 @@ public class PostService {
     private final ReactionMapper reactionMapper;
     private final ReactionRepository reactionRepository;
     private final PersonalisationClient personalisationClient;
-    private final PreferenceMapper preferenceMapper;
 
     @Transactional
     public String createPost(PostDTO postDTO){
@@ -272,22 +273,18 @@ public class PostService {
     }
 
     private PreferenceDTO findPostsByPreference(final String tagIdentifier){
-        List<PreferenceModel> preferenceModels = postRepository.findPostsByTags(tagIdentifier);
-//        if(!CollectionUtils.isEmpty(preferenceModels)){
-//            final String preferenceName = preferenceModels.get(0).getName();
-//            List<PostSummaryDTO> summaries = preferenceModels.stream().map(model -> extractToPostSummary(model.getPost()))
-//                                                .collect(Collectors.toList());
-//            return preferenceMapper.toDTO(preferenceName,summaries);
-//        }
+        Optional<TagEntity> interest = tagRepository.findByIdentifier(tagIdentifier);
+        if(interest.isPresent()){
+            List<PostEntity> preferredPosts = postRepository.findPostsByTags(tagIdentifier);
+            List<PostSummaryDTO> summaries = new ArrayList<>();
+            for(PostEntity post:preferredPosts){
+                List<String> tagNames = post.getTags().stream().map(TagEntity::getName).collect(Collectors.toList());
+                summaries.add(postMapper.toPostSummary(post,tagNames));
+            }
+            return PreferenceDTO.builder().preference(interest.get().getName())
+                    .postSummaries(CollectionUtils.isNotEmpty(summaries) ? summaries : Collections.emptyList()).build();
+        }
         return null;
     }
-//    private List<PostSummaryDTO> extractSummaries(final List<PreferenceModel> models){
-//        return models.stream().map(model-> extractToPostSummary(model.getPost())).collect(Collectors.toList());
-//    }
-//
-//    private PostSummaryDTO extractToPostSummary(final PostEntity postEntity){
-//        List<String> tags = postEntity.getTags().stream().map(TagEntity::getName).collect(Collectors.toList());
-//        return postMapper.toPostSummary(postEntity,tags);
-//    }
 
 }

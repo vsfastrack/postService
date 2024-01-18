@@ -1,14 +1,14 @@
 package com.tech.bee.postservice.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@JsonInclude(JsonInclude.Include.NON_EMPTY)
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PreferenceDTO {
     private String preference;
     private List<PostSummaryDTO> postSummaries;
