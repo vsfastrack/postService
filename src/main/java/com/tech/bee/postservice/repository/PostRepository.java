@@ -1,7 +1,6 @@
 package com.tech.bee.postservice.repository;
 
 import com.tech.bee.postservice.entity.PostEntity;
-import com.tech.bee.postservice.model.PreferenceModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
