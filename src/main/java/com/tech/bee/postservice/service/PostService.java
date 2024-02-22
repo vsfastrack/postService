@@ -247,7 +247,7 @@ public class PostService {
         PostEntity existingPost =  postRepository.findByPostId(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
                 errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
                 .build());
-        Long viewedBy = existingPost.getViewedBy();
+        Long viewedBy = Objects.nonNull(existingPost.getViewedBy()) ? existingPost.getViewedBy() : 0;
         existingPost.setViewedBy(viewedBy+1);
     }
 
