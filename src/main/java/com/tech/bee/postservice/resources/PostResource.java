@@ -3,11 +3,8 @@ package com.tech.bee.postservice.resources;
 import com.tech.bee.postservice.annotation.RequestMetrics;
 import com.tech.bee.postservice.annotation.TransactionId;
 import com.tech.bee.postservice.common.ApiResponseDTO;
-import com.tech.bee.postservice.dto.PostSearchDTO;
-import com.tech.bee.postservice.dto.PostDTO;
+import com.tech.bee.postservice.dto.*;
 import com.tech.bee.postservice.constants.ApiConstants;
-import com.tech.bee.postservice.dto.PostSummaryDTO;
-import com.tech.bee.postservice.dto.ReactionDTO;
 import com.tech.bee.postservice.enums.Enums;
 import com.tech.bee.postservice.metrics.RequestMetricCounter;
 import com.tech.bee.postservice.service.PostService;
@@ -60,6 +57,7 @@ public class PostResource {
     public ResponseEntity<ApiResponseDTO> findPostDetails(@PathVariable("postIdentifier") final String postIdentifier){
         log.info("{} hit with postIdentifier {}" , "/{postIdentifier}/details" , postIdentifier);
         PostDTO postDTO = postService.getPostDetails(postIdentifier);
+        postService.increaseViewCounter(postIdentifier);
         return new ResponseEntity<>(ApiResponseDTO.builder().content(postDTO).build(), HttpStatus.OK);
     }
 
@@ -111,5 +109,13 @@ public class PostResource {
                                                  @RequestParam(name = "reaction") final Enums.ReactionEnum reaction){
         String reactionIdentifier = postService.react(postIdentifier , reaction);
         return new ResponseEntity<>(ApiResponseDTO.builder().content(reactionIdentifier).build(), HttpStatus.OK);
+    }
+
+    @TransactionId
+    @RequestMetrics
+    @GetMapping("/preferences")
+    public ResponseEntity<ApiResponseDTO> preferredPosts(){
+       List<PreferenceDTO> preferences = postService.getPreferences();
+        return new ResponseEntity<>(ApiResponseDTO.builder().content(preferences).build(), HttpStatus.OK);
     }
 }

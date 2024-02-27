@@ -1,5 +1,6 @@
 package com.tech.bee.postservice.service;
 
+import com.tech.bee.postservice.client.personalisation.PersonalisationClient;
 import com.tech.bee.postservice.common.ErrorDTO;
 import com.tech.bee.postservice.common.PageResponseDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
@@ -48,6 +49,7 @@ public class PostService {
     private final SecurityService securityService;
     private final ReactionMapper reactionMapper;
     private final ReactionRepository reactionRepository;
+    private final PersonalisationClient personalisationClient;
 
     @Transactional
     public String createPost(PostDTO postDTO){
@@ -239,6 +241,22 @@ public class PostService {
                 .httpStatus(HttpStatus.BAD_REQUEST)
                 .build();
     }
+
+    @Transactional
+    public void increaseViewCounter(String postIdentifier){
+        PostEntity existingPost =  postRepository.findByPostId(postIdentifier).orElseThrow(() -> BaseCustomException.builder().
+                errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
+                .build());
+        Long viewedBy = Objects.nonNull(existingPost.getViewedBy()) ? existingPost.getViewedBy() : 0;
+        existingPost.setViewedBy(viewedBy+1);
+    }
+
+    public List<PreferenceDTO> getPreferences(){
+        String currentUserId = securityService.getCurrentLoggedInUser();
+        final List<String> interests = personalisationClient.fetchInterests(currentUserId);
+        return interests.stream().map(this::findPostsByPreference).collect(Collectors.toList());
+    }
+
     @Transactional
     private void dislikePost(PostEntity postEntity , ReactionEntity reactionEntity){
         Long likesCount = postEntity.getLikes();
@@ -252,6 +270,21 @@ public class PostService {
         postEntity.setLikes(likesCount + 1);
         reactionRepository.save(reactionEntity);
         postRepository.save(postEntity);
+    }
+
+    private PreferenceDTO findPostsByPreference(final String tagIdentifier){
+        Optional<TagEntity> interest = tagRepository.findByIdentifier(tagIdentifier);
+        if(interest.isPresent()){
+            List<PostEntity> preferredPosts = postRepository.findPostsByTags(tagIdentifier);
+            List<PostSummaryDTO> summaries = new ArrayList<>();
+            for(PostEntity post:preferredPosts){
+                List<String> tagNames = post.getTags().stream().map(TagEntity::getName).collect(Collectors.toList());
+                summaries.add(postMapper.toPostSummary(post,tagNames));
+            }
+            return PreferenceDTO.builder().preference(interest.get().getName())
+                    .postSummaries(CollectionUtils.isNotEmpty(summaries) ? summaries : Collections.emptyList()).build();
+        }
+        return null;
     }
 
 }
