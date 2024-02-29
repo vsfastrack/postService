@@ -40,7 +40,7 @@ public class BaseWebClient {
                 .build();
     }
 
-    protected String obtainAccessToken(){
+    protected String obtainAdminAccessToken(){
         String requestBody = "grant_type=client_credentials" +
                 "&client_id=" + adminClientProperties.getClientId()+
                 "&client_secret=" + adminClientProperties.getClientSecret();

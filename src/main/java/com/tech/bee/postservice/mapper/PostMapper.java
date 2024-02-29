@@ -26,7 +26,7 @@ public interface PostMapper {
     @Mapping(ignore = true, target = "links")
     @Mapping(ignore = true, target = "tags")
     @Mapping(expression = "java(toId(postDTO))" , target="postId")
-    PostEntity toEntity(PostDTO postDTO);
+    PostEntity toEntity(final PostDTO postDTO);
 
     @Mapping(source = "title" , target = "title")
     @Mapping(source = "subtitle" , target = "subtitle")

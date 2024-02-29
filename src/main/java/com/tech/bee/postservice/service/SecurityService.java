@@ -4,6 +4,7 @@ import com.tech.bee.postservice.common.ErrorDTO;
 import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.enums.Enums;
 import org.keycloak.KeycloakPrincipal;
+import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -46,5 +47,13 @@ public class SecurityService {
             return credentials.toString();
         }
         return null;
+    }
+
+    public String getCurrentUserAccessToken() {
+        // Retrieve the authentication token from the SecurityContextHolder
+        KeycloakAuthenticationToken authenticationToken = (KeycloakAuthenticationToken) SecurityContextHolder.getContext().getAuthentication();
+        if(authenticationToken == null)
+            return null;
+        return authenticationToken.getAccount().getKeycloakSecurityContext().getTokenString();
     }
 }

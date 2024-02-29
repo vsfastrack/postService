@@ -5,9 +5,12 @@ import com.tech.bee.postservice.configuration.personalisation.PersonalisationCli
 import com.tech.bee.postservice.constants.ApiConstants;
 import com.tech.bee.postservice.dto.client.InterestDTO;
 import com.tech.bee.postservice.exception.BaseCustomException;
+import com.tech.bee.postservice.model.ExternalApiModel;
+import com.tech.bee.postservice.model.ProfileModel;
 import com.tech.bee.postservice.service.SecurityService;
 import com.tech.bee.postservice.util.AppUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +37,7 @@ public class PersonalisationClient extends BaseWebClient {
         final String fetchPreferencesUri = configuration.getPersonalisationClientProperties().getFetchPreferencesPath() + userId;
         InterestDTO interestResponse = client.get().uri(new UriTemplate(fetchPreferencesUri).toString())
                 .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
-                .headers(httpHeaders -> httpHeaders.setBearerAuth(obtainAccessToken()))
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(obtainAdminAccessToken()))
                 .retrieve()
                 .toEntity(InterestDTO.class)
                 .blockOptional()
@@ -43,6 +46,21 @@ public class PersonalisationClient extends BaseWebClient {
                                 ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
                         .build());
         return interestResponse.getContent();
+    }
+
+    public ProfileModel fetchProfile(){
+        final String fetchProfileUri = configuration.getPersonalisationClientProperties().getFetchProfilePath() ;
+        final ExternalApiModel<ProfileModel> profileApiResponse = client.get().uri(new UriTemplate(fetchProfileUri).toString())
+                .headers(httpHeaders -> httpHeaders.setContentType(MediaType.APPLICATION_JSON))
+                .headers(httpHeaders -> httpHeaders.setBearerAuth(securityService.getCurrentUserAccessToken()))
+                .retrieve()
+                .toEntity(new ParameterizedTypeReference<ExternalApiModel<ProfileModel>>() {})
+                .blockOptional()
+                .map(ResponseEntity::getBody).orElseThrow(() -> BaseCustomException.builder().
+                        errors(Collections.singletonList(AppUtil.buildResourceNotFoundError(
+                                ApiConstants.KeyConstants.KEY_POST))).httpStatus(HttpStatus.NOT_FOUND)
+                        .build());
+        return profileApiResponse.getContent();
     }
 
 }

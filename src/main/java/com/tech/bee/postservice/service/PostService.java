@@ -15,6 +15,7 @@ import com.tech.bee.postservice.mapper.LinkMapper;
 import com.tech.bee.postservice.mapper.PostMapper;
 import com.tech.bee.postservice.mapper.ReactionMapper;
 import com.tech.bee.postservice.mapper.TagMapper;
+import com.tech.bee.postservice.model.ProfileModel;
 import com.tech.bee.postservice.repository.CustomRepository;
 import com.tech.bee.postservice.repository.PostRepository;
 import com.tech.bee.postservice.repository.ReactionRepository;
